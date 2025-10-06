@@ -98,45 +98,52 @@ def get_st(tgt: str, service: str) -> Optional[str]:
         print("Failed to get ST", e)
         return None
 
-
-
-#develop api session next
-
-
-#throws not allowed for url error
-def get_workspace(st: str) -> Optional[Dict]:
-    url = f"{BASE_URL}/api/workspace"
+#working
+def get_api_session(st: str) -> Optional[requests.Session]:
+    url = f"{BASE_URL}/api/login?ticket={st}"
     headers = {"Authorization": f"? {st}"}
     try:
-        response = requests.get(url, headers=headers)
+        session = requests.Session()
+        response = session.get(url, headers=headers)
         response.raise_for_status()
-        try:
-            return response.json()
-        except ValueError:
-            print("Response not JSON:", response.text)
-            return None
+        return session
     except requests.exceptions.RequestException as e:
-        print("Failed to get workspace", e)
+        print("Failed to get API session", e)
         return None
+    
+# Exchanging ST for a session cookie (NOT WORKING NEEDED FOR WORKSPACE CALL)
+def get_authenticated_session(service_url: str, st: str) -> requests.Session:
+    session = requests.Session()
+    response = session.get(f"{service_url}?ticket={st}")
+    response.raise_for_status()
+    return session
+
+#throws not allowed for url error
+def get_workspace(session: requests.Session) -> dict:
+    url = f"{BASE_URL}/api/workspace"
+    response = session.get(url)
+    response.raise_for_status()
+    return response.json()
 
 
-
-
+# MAIN
 if __name__ == "__main__":
     tgt = get_tgt(USERNAME, PASSWORD)
     if not tgt:
-        exit("Cannot continue without a TGT")
-
-    st=get_st(tgt,f"{BASE_URL}/api/workspaces")
+        print("Failed to obtain TGT")
+        exit(1)
+    print("TGT:", tgt)
+    st = get_st(tgt, f"{BASE_URL}/api/login")
     if not st:
-        exit("Cannot continue without a ST")
-
-    workspaces = get_workspace(st)
-    if workspaces:
-        print("Workspaces fetched successfully:")
-        print(workspaces)
-    else:
-        print("Failed to fetch workspaces.")
+        print("Failed to obtain ST")
+        exit(1)
+    print("ST:", st)
+    api_session = get_api_session(st)
+    if not api_session:
+        print("Failed to obtain API session")
+        exit(1)
+    print("API session: ", api_session)
+    
 
 
 
