@@ -4,6 +4,7 @@ import requests
 from typing import Any, Dict, Optional
 from mcp.server.fastmcp import FastMCP
 
+
 load_dotenv()
 mcp = FastMCP("opsready")
 BASE_URL = "https://or-student-sandbox.opsready.com"
