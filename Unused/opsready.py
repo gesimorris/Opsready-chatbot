@@ -10,8 +10,7 @@ mcp = FastMCP("opsready")
 BASE_URL = "https://or-student-sandbox.opsready.com"
 USERNAME = os.getenv("OPSREADY_USERNAME")
 PASSWORD = os.getenv("OPSREADY_PASSWORD")
-print ("username: " + USERNAME)
-print ("password: " + PASSWORD)
+
 
 
 #recently works to get tgt and st not session

@@ -1,8 +1,7 @@
 from datetime import datetime, timezone
-from opsready import get_tgt, get_st, get_api_session
+from Unused.opsready import get_tgt, get_st, get_api_session
 import os
 from dotenv import load_dotenv
-import requests
 
 load_dotenv()
 BASE_URL = "https://or-student-sandbox.opsready.com"

@@ -1,19 +1,16 @@
 from datetime import datetime, timezone
-from typing import List
 import os
 from dotenv import load_dotenv
-import requests
-from typing import Any, Dict, Optional
-from mcp.server.fastmcp import FastMCP
-import requests
-import asyncio
 from mcp.server import Server
-from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
-from opsready import get_tgt, get_st, get_api_session
+from Unused.opsready import get_tgt, get_st, get_api_session
+"""
+*************************************************************************************************************************
+FILE NOT IN USE ANYMORE, SERVER.PY IS MAIN SERVER, ALL TOOL LOGIC SHOULD BE DEFINED IN THEIR OWN SEPERATE FILE AND PLACED
+IN "tools" DIRECTORY
+*************************************************************************************************************************
+"""
 
-"""Logic works, tested in test_user_logins, can auth and get users. Next steps for this file is to set up claude desktop and
-point it to server to test that works."""
 load_dotenv()
 BASE_URL = "https://or-student-sandbox.opsready.com"
 USERNAME = os.getenv("OPSREADY_USERNAME")
@@ -37,6 +34,25 @@ async def list_tools() -> list[Tool]:
                     }
                 },
                 "required": ["since_date"]
+            }
+        ),
+        Tool(
+            name="get_assigned_tasks",
+            description="Return the tasks that are assigned to a user, all, due, upcoming",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "query_type": {
+                        "type": "string",
+                        "enum": ["list_all", "overdue", "upcoming"],
+                            "description": (
+                            "Type of query to run: "
+                            "'list_all' (all tasks), 'overdue' (past due_date), "
+                            "or 'upcoming' (due soon)."
+                        )
+                    },
+                    "required": ["query_type"]
+                }
             }
         )
     ]
@@ -85,7 +101,11 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                 try:
                     last_login = datetime.fromisoformat(last_login_str.replace("Z", "+00:00"))
                     if last_login >= since:
-                        users.append(user.get("id"))
+                        users.append({
+                            # "id": user.get("id"),
+                            "name": user.get("username"),
+                            "last_login": last_login_str
+                        })
                 except (ValueError, AttributeError):
                     continue
 
@@ -106,7 +126,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             text=f"Unknown tool: {name}"
         )]
 
-
+'''
 async def main():
     """Run the MCP server using stdio transport."""
     async with stdio_server() as (read_stream, write_stream):
@@ -114,12 +134,18 @@ async def main():
             read_stream,
             write_stream,
             app.create_initialization_options()
-        )
+        )'''
+async def main():
+    from mcp.server.stdio import stdio_server
+    print("Server running")
+    async with stdio_server() as (read_stream, write_stream):
+        await app.run(read_stream, write_stream, app.create_initialization_options())
 
 
 if __name__ == "__main__":
     import asyncio
 
+    print("Starting OpsReady MCP Server...")
     asyncio.run(main())
 
 
