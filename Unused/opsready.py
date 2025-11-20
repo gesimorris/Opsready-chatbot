@@ -44,7 +44,8 @@ def get_st(tgt: str, service: str) -> Optional[str]:
     except requests.exceptions.RequestException as e:
         print("Failed to get ST", e)
         return None
-
+'''
+**Uncomment for last working**
 def get_api_session(st):
     url = f"{BASE_URL}/api/login?ticket={st}"
     print(f"\n=== Login Request ===")
@@ -60,6 +61,26 @@ def get_api_session(st):
     print(f"===================\n")
 
     response.raise_for_status()
+    return session
+'''
+def get_api_session(st):
+    session = requests.Session()
+    url = f"{BASE_URL}/api/login?ticket={st}"
+    login_response = session.get(url)
+    login_response.raise_for_status()
+
+
+    csrf_url = f"{BASE_URL}/api/csrf_token"
+    csrf_response = session.get(csrf_url)
+    csrf_response.raise_for_status()
+
+
+    csrf_token = csrf_response.headers.get("x-csrf-token")
+    if not csrf_token:
+        raise Exception("CSRF token not found in headers")
+
+    # Add token to session headers for future requests
+    session.headers.update({"X-CSRF-Token": csrf_token})
     return session
 
 

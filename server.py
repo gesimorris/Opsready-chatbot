@@ -8,6 +8,10 @@ from tools.tool_debug_tasks_sample import get_task_sample
 from tools.tool_get_all_assigned_users import get_all_assigned_users
 from tools.tool_get_overdue_tasks import get_overdue_tasks
 from tools.tool_get_task_summary_report import get_task_summary_report
+from tools.tool_task_asignee import get_task_assignee
+from tools.tool_activity_feed import get_activity_feed
+from tools.tool_list_forms import get_workspace_forms_tool
+from tools.tool_get_asset_deficiencies import get_asset_deficiencies
 
 
 
@@ -107,6 +111,80 @@ Tool(
     description="Generate a summary report of all OpsReady tasks: total, assigned/unassigned, overdue, due soon, and category breakdown.",
     inputSchema={"type": "object", "properties": {}}
 ),
+        Tool(
+            name="get_task_assignee",
+            description=(
+                "Retrieves task information from a given workspace. "
+                "If the user asks for *unassigned tasks*, it returns only those with no assignee. "
+                "Otherwise, it returns all tasks in the workspace, including those that are assigned."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "workspace_name": {
+                        "type": "string",
+                        "description": "The name of the workspace to get tasks from."
+                    },
+                    "unassigned_only": {
+                        "type": "boolean",
+                        "description": (
+                            "Optional. If true, returns only tasks without an assigned user. "
+                            "If false or omitted, returns all tasks."
+                        ),
+                        "default": False
+                    }
+                },
+                "required": ["workspace_name"]
+            }
+        ),
+        Tool(
+            name="get_activity_feed",
+            description="Returns the most active users in a workspace, who has submitted forms, and most active ",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "workspace_name": {
+                        "type": "string",
+                        "description": "Name of the workspace",
+                    },
+                    "unassigned_only": {
+                        "type": "boolean",
+                        "description": "If True, show only unassigned tasks",
+                        "default": False
+
+                    }
+                },
+                "required": ["workspace_name"]
+            }
+        ),
+        Tool(
+            name="get_workspace_forms",
+            description="Returns all available forms (and their IDs) for a specific OpsReady workspace.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "workspace_name": {
+                        "type": "string",
+                        "description": "The name of the OpsReady workspace (e.g., 'Summit Base')."
+                    }
+                },
+                "required": ["workspace_name"]
+            }
+        ),
+        Tool(
+            name="get_workspace_deficiencies",
+            description="Fetches all deficiencies for a given workspace and lists their status.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "workspace_name": {
+                        "type": "string",
+                        "description": "The name of the workspace to fetch deficiencies for."
+                    }
+                },
+                "required": ["workspace_name"]
+            }
+        )
 
 
 
@@ -129,6 +207,15 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return await get_overdue_tasks()
     if name == "get_task_summary_report":
         return await get_task_summary_report()
+    elif name == "get_task_assignee":
+        return await get_task_assignee(arguments["workspace_name"])
+    elif name == "get_activity_feed":
+        return await get_activity_feed(arguments["workspace_name"])
+    elif name == "get_workspace_forms":
+        return await get_workspace_forms_tool(arguments["workspace_name"])
+    elif name == "get_workspace_deficiencies":
+        return await get_asset_deficiencies(arguments["workspace_name"])
+
 
 
 
