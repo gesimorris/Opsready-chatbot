@@ -12,6 +12,7 @@ from tools.tool_task_asignee import get_task_assignee
 from tools.tool_activity_feed import get_activity_feed
 from tools.tool_list_forms import get_workspace_forms_tool
 from tools.tool_get_asset_deficiencies import get_asset_deficiencies
+from tools.tool_work_orders import get_work_orders
 
 
 
@@ -184,6 +185,20 @@ Tool(
                 },
                 "required": ["workspace_name"]
             }
+        ),
+        Tool(
+            name="get_work_orders",
+            description="Get work orders with optional status filter.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "description": "Status of work orders to filter by (e.g., 'Open', 'Closed')."
+                    }
+                },
+                "required": []
+            }
         )
 
 
@@ -197,15 +212,15 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
     if name == "get_recent_logins":
         return await get_recent_logins(arguments["since_date"])
-    if name == "get_user_tasks":
+    elif name == "get_user_tasks":
         return await get_user_tasks(arguments["identifier"])
-    if name == "get_task_sample":
+    elif name == "get_task_sample":
         return await get_task_sample(arguments.get("limit", 5))
-    if name == "get_all_assigned_users":
+    elif name == "get_all_assigned_users":
         return await get_all_assigned_users()
-    if name == "get_overdue_tasks":
+    elif name == "get_overdue_tasks":
         return await get_overdue_tasks()
-    if name == "get_task_summary_report":
+    elif name == "get_task_summary_report":
         return await get_task_summary_report()
     elif name == "get_task_assignee":
         return await get_task_assignee(arguments["workspace_name"])
@@ -215,6 +230,9 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return await get_workspace_forms_tool(arguments["workspace_name"])
     elif name == "get_workspace_deficiencies":
         return await get_asset_deficiencies(arguments["workspace_name"])
+    elif name == "get_work_orders":
+        status = arguments.get("status")
+        return await get_work_orders(status=status)
 
 
 
