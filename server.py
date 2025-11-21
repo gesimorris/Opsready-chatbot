@@ -3,6 +3,13 @@ from dotenv import load_dotenv
 from mcp.server import Server
 from mcp.types import Tool, TextContent
 from tools.tool_recent_logins import get_recent_logins
+from tools.tool_get_user_tasks import get_user_tasks
+from tools.tool_debug_tasks_sample import get_task_sample
+from tools.tool_get_all_assigned_users import get_all_assigned_users
+from tools.tool_get_overdue_tasks import get_overdue_tasks
+from tools.tool_get_task_summary_report import get_task_summary_report
+from tools.tool_work_orders import get_work_orders
+
 
 """
 This file is the main MCP Server file, it creates the folder, defines tool frameworks and calls individual tools by calling
@@ -56,35 +63,68 @@ async def list_tools() -> list[Tool]:
                 "required": ["query_type"]
             }
         ),
-        Tool(
-            name="get_unresolved_asset_count",
-            description="Returns the total count of assets with unresolved deficiencies for a given workspace.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "workspace_id": {
-                        "type": "string",
-                        "description": "The ID of the main OpsReady workspace to analyze."
-                    }
-                },
-                "required": ["workspace_id"]
+      Tool(
+    name="get_user_tasks",
+    description="Get all tasks assigned to a specific user by name, username, or email.",
+    inputSchema={
+        "type": "object",
+        "properties": {
+            "identifier": {
+                "type": "string",
+                "description": "Name, username, or email of the user to fetch tasks for."
             }
-        ),
-        Tool(
-            name="get_workspace_forms",
-            description="Returns all available forms (and their IDs) for a specific OpsReady workspace.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "workspace_name": {
-                        "type": "string",
-                        "description": "The name of the OpsReady workspace (e.g., 'Summit Base')."
-                    }
-                },
-                "required": ["workspace_name"]
+        },
+        "required": ["identifier"]
+    }
+  ),
+
+         Tool(
+    name="get_task_sample",
+    description="Return a small sample of tasks with basic fields for debugging.",
+    inputSchema={
+        "type": "object",
+        "properties": {
+            "limit": {
+                "type": "integer",
+                "description": "How many tasks to show (default 5)."
             }
-        )
-    ]
+        },
+        "required": []
+    }
+),
+Tool(
+    name="get_all_assigned_users",
+    description="List all users who currently have one or more tasks assigned, with task counts.",
+    inputSchema={"type": "object", "properties": {}}
+),
+Tool(
+    name="get_overdue_tasks",
+    description="List all tasks whose due date is before today (UTC).",
+    inputSchema={"type": "object", "properties": {}}
+),
+Tool(
+    name="get_task_summary_report",
+    description="Generate a summary report of all OpsReady tasks: total, assigned/unassigned, overdue, due soon, and category breakdown.",
+    inputSchema={"type": "object", "properties": {}}
+),
+Tool(
+    name="get_work_orders",
+    description="Get work orders with optional status filter.",
+    inputSchema={
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "string",
+                "description": "Status of work orders to filter by (e.g., 'Open', 'Closed')."
+            }
+        },
+        "required": []
+    }
+)
+
+
+
+         ]
 
 
 @app.call_tool()
@@ -93,28 +133,27 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
     if name == "get_recent_logins":
         return await get_recent_logins(arguments["since_date"])
-
-    elif name == "get_workspace_forms":
-        from tools.tool_list_forms import get_workspace_forms_tool
-        return await get_workspace_forms_tool(arguments["workspace_name"])
-
-
-
-
-
-
-
-
-
-
-
+    if name == "get_user_tasks":
+        return await get_user_tasks(arguments["identifier"])
+    if name == "get_task_sample":
+        return await get_task_sample(arguments.get("limit", 5))
+    if name == "get_all_assigned_users":
+        return await get_all_assigned_users()
+    if name == "get_overdue_tasks":
+        return await get_overdue_tasks()
+    if name == "get_task_summary_report":
+        return await get_task_summary_report()
+    if name == "get_work_orders":
+        status = arguments.get("status")
+        return await get_work_orders(status=status)
 
 
 
 
 
 
-
+    #elif name == "get_assigned_tasks":   //demonstrating how tool calls will work
+        return null
 
 async def main():
     from mcp.server.stdio import stdio_server

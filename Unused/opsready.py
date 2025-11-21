@@ -62,6 +62,30 @@ def get_api_session(st):
     response.raise_for_status()
     return session
 
+def get_csrf_token(session):
+    url = f"{BASE_URL}/api/csrf_token"
+    print(f"\n=== CSRF Request ===")
+    print(f"URL: {url}")
+
+    response = session.get(url)
+
+    print("Status Code:", response.status_code)
+    print("Headers:", dict(response.headers))
+    print("Raw Text Response:", response.text[:200])
+    print("Cookies:", session.cookies.get_dict())
+    print("====================\n")
+
+    # CSRF token is stored in headers, NOT JSON
+    token = response.headers.get("X-CSRF-Token") or response.headers.get("x-csrf-token")
+
+    if not token:
+        print("⚠️ No CSRF token found in headers.")
+        return None
+
+    print("✔️ CSRF Token Found:", token)
+    return token
+
+
 
 
 #throws not allowed for url error
@@ -91,28 +115,30 @@ def get_workspace(session: requests.Session) -> Optional[Dict]:
         print("Failed to get workspace", e)
         return None
 
-
-
 if __name__ == "__main__":
     tgt = get_tgt(USERNAME, PASSWORD)
-    print(tgt)
     if not tgt:
-        exit("Cannot continue without a TGT")
+        print("Failed to get TGT")
+        exit(1)
 
-    #st=get_st(tgt,f"{BASE_URL}/api/workspace")
-    service_url = f"{BASE_URL}/api/login"  # Changed from /workspaces to /workspace
+    service_url = f"{BASE_URL}/api/login"
     st = get_st(tgt, service_url)
-    print(st)
     if not st:
-        exit("Cannot continue without a ST")
-    session = get_api_session(st)
+        print("Failed to get ST")
+        exit(1)
 
-    workspaces = get_workspace(session)
-    if workspaces:
-        print("Workspaces fetched successfully:")
-        print(workspaces)
-    else:
-        print("Failed to fetch workspaces.")
+    session = get_api_session(st)
+    if not session:
+        print("Failed to create API session")
+        exit(1)
+
+    csfr_token = get_csrf_token(session)
+    print("CSRF Token:", csfr_token)
+    if not csfr_token:
+        print("Failed to get CSRF token")
+        exit(1)
+
+    
 
 
 
