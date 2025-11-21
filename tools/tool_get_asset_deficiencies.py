@@ -16,9 +16,6 @@ PASSWORD = os.getenv("OPSREADY_PASSWORD")
 
 async def get_asset_deficiencies(workspace_name: str) -> List[TextContent]:
     all_ws_url = f"{BASE_URL}/api/workspace?limit=50&offset=0&archived=false&order=_created,desc,,last&hidden=false"
-
-
-
     try:
         tgt = get_tgt(USERNAME, PASSWORD)
         if not tgt:
