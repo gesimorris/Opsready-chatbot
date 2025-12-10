@@ -12,8 +12,6 @@ such as:
 
 It exposes a set of tools, which are API endpoints to Claude, so Claude can call and retrieve structured data and perform
 queries. This enables a conversational style interface that allows users to get answers and insights into their operational data.
-## Overview
-
 
 ## Features:
 
