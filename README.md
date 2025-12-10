@@ -15,24 +15,24 @@ queries. This enables a conversational style interface that allows users to get 
 
 ## Features:
 
-###Authentication
+### Authentication
 - Authenticate each API call using user credentials
 - Get TGT -> ST -> Session
 - Ensure users are authroized to see data
 - Respond with "Not Authorized" message in the case that a user is not authorized
 
-###Workspace Tools
+### Workspace Tools
 - Takes in workspace name
 - Fetch all assets in a workspace
 - Get the activity feed from any workspace
 - Find tasks in workspaces
 
-###Deficiency Tools
+### Deficiency Tools
 - Get details for deficiencies in workspaces
 - Find if deficiencies have related tasks
 - Get more information on deficiencies
 
-###Tasks
+### Tasks
 
 
 ### Tool2:
