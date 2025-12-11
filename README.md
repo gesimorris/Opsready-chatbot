@@ -159,10 +159,30 @@ try:
 ```
 This code calls functions that are created in our opsready.py, which is responsibe for getting tgt, st, and session instances for the user requesting data.
 
-### Tool3:
-- ipsum
+## Adding New Tools
+The way we designed our MCP server makes it very easy to add and remove tools from Claude.
 
-### Tool4
+### Adding to Servery.py
+
+Usually the first step to adding a new tool is to add the tools description to Server.py. Although there is no required order to adding a new tool, adding the tool description first allows you to understand what the tool needs.
+
+Use this template to add a new tool to Server.py. The tool description must be added in the function list_tools() function, as described in [Architecture & Design](#architecture).
+```
+        Tool(
+            name="tool_name_here",
+            description="Tool description here (what the tool does)",
+            inputSchema={
+                "type": "object",
+                "properties": {   #Paramaters your tool will take
+                    "param_name (any name) ": {
+                        "type": "string",    #type of paramater (Int, String, etc)
+                        "description": "Description of the paramater here",
+                    }
+                },
+                "required": ["since_date"]     #any paramaters that are required must be set as required
+            }
+        ),
+```
 
 
 
