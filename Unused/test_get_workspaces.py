@@ -1,6 +1,6 @@
 import json
 from typing import Dict, List
-from Unused.opsready import get_tgt, get_st, get_api_session
+from opsready import get_tgt, get_st, get_api_session
 import os
 from dotenv import load_dotenv
 

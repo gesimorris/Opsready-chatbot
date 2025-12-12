@@ -4,7 +4,7 @@ from mcp.types import TextContent
 from typing import List
 import os
 from dotenv import load_dotenv
-from Unused.opsready import get_tgt, get_st, get_api_session
+from opsready import get_tgt, get_st, get_api_session
 
 load_dotenv()
 

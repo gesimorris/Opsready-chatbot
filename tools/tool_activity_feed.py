@@ -1,16 +1,14 @@
-from datetime import datetime, timezone
+"""
+Tool to display the activity feed on the given workspace
+Takes query "Show me the activity in Summit Base"
+Returns the activity in that workspace, forms submitted, incidents submitted etc
+"""
 import os
 from typing import List
 
 from dotenv import load_dotenv
 from mcp.types import TextContent
-from Unused.opsready import get_tgt, get_st, get_api_session
-
-"""
-Working, need to add way to map creator_id to actual users name
-
-
-"""
+from opsready import get_tgt, get_st, get_api_session
 
 load_dotenv()
 BASE_URL = "https://or-student-sandbox.opsready.com"
@@ -21,7 +19,7 @@ async def get_activity_feed(workspace_name: str) -> List[TextContent]:
 #url to get all the workstations
     all_ws_url = f"{BASE_URL}/api/workspace?limit=50&offset=0&archived=false&order=_created,desc,,last&hidden=false"
 
-#authenticate by calling the functions created in opsready.py
+#authenticate
     try:
         tgt = get_tgt(USERNAME, PASSWORD)
         if not tgt:
@@ -31,11 +29,13 @@ async def get_activity_feed(workspace_name: str) -> List[TextContent]:
         service_url = f"{BASE_URL}/api/login"
         st = get_st(tgt, service_url)
         session = get_api_session(st)
-
+# end auth
+        #get sessions and get workstations
         response = session.get(all_ws_url)
         response.raise_for_status()
         data = response.json()
 
+#loop through all the ws gotten from above, find the is that matches the param, store in val
         workspace_id= None
         for ws in data:
             if ws.get("name", "").lower() == workspace_name.lower():
@@ -45,22 +45,23 @@ async def get_activity_feed(workspace_name: str) -> List[TextContent]:
             return [TextContent(type="text", text="Failed to get workspace with that name")]
 
 
-        #get the activity for the user requested workspace
+#get the activity feed for the user requested workspace sent through param
         activity_feed_url = (
             f"{BASE_URL}/api/workspace/{workspace_id}/events/flat"
             "?limit=50&offset=0&include_references=true"
             "&categories=chat&categories=data&categories=details"
         )
-        #get response data from the activity feed api
+
+#get response data from the activity feed api
         activity_response = session.get(activity_feed_url)
         activity_response.raise_for_status()
         data = activity_response.json()
 
-        #if not data, meaning no workspace with that name entered
+#if not data, meaning no workspace with that name entered
         if not data:
             return [TextContent(type="text", text="No recent activities found for workspace")]
 
-        #get specific responses that we want and store them in variables
+#get specific responses that we want and store them in variables
         activities_list = data.get("results", [])
         references = data.get("references", {})
         accounts = references.get("accounts", {})
@@ -96,15 +97,13 @@ async def get_activity_feed(workspace_name: str) -> List[TextContent]:
             lines.append(f" {created} — {creator_name} - {content or 'None'}")
 
 
-
+#create output string to send to claude
         output = f"Recent activity in **{workspace_name}**:\n" + "\n".join(lines)
         return [TextContent(type="text", text=output)]
 
     except Exception as e:
         return [TextContent(type="text", text=f" Error: {e}")]
 
-    #get workspace name from input -> map it to ID store ID in var,
-    #pass that var to call the activity feed
 
 
 

@@ -1,15 +1,13 @@
-
+"""
+Tool that takes a query like "Show me all the unassigned/assigned tasks in Summit Base"
+Returns the tasks in the workspace with the name of employee it's assigned to
+"""
 import os
 from typing import List, Optional
 from dotenv import load_dotenv
 from mcp.types import TextContent
-from Unused.opsready import get_tgt, get_st, get_api_session
+from opsready import get_tgt, get_st, get_api_session
 
-"""
-Working, need to add way to map creator_id to actual users name
-
-
-"""
 
 load_dotenv()
 BASE_URL = "https://or-student-sandbox.opsready.com"

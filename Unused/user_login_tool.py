@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from mcp.server import Server
 from mcp.types import Tool, TextContent
-from Unused.opsready import get_tgt, get_st, get_api_session
+from opsready import get_tgt, get_st, get_api_session
 """
 *************************************************************************************************************************
 FILE NOT IN USE ANYMORE, SERVER.PY IS MAIN SERVER, ALL TOOL LOGIC SHOULD BE DEFINED IN THEIR OWN SEPERATE FILE AND PLACED

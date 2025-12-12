@@ -6,7 +6,7 @@ import os
 from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv
 from collections import Counter
-from Unused.opsready import get_tgt, get_st, get_api_session
+from opsready import get_tgt, get_st, get_api_session
 
 load_dotenv()
 

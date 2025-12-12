@@ -70,7 +70,7 @@ Asset List
     09393baf-d477-4d6b-baf3-1bfc548ad4cc year string
 
 Booster Station Hours:
-9102a7a3-56f4-4ad0-a4d1-f55d145d593f"
+9102a7a3-56f4-4ad0-a4d1-f55d145d593f
 
 Booster Station Panel
 4fc0e09e-ee3d-416f-a170-cff56a812237
@@ -112,6 +112,8 @@ c27c33ba-75f8-432a-bd63-c4e361a52f67
     2f359f40-c5db-4e6a-98b7-5e6258f9950e service_due string
     79c6a2f0-2796-4f9b-a55d-99f4ccf31a8f schedule_id string
 
+    get defeciencies -> get the asset associated with -> check if task is associated with it
+
 Employee Labor
 abe863d1-7330-42f3-8266-bdd16caaa938
 
@@ -149,3 +151,70 @@ a7e15ab9-5124-492a-aa4d-0db503b1dd20
 
 Third Party Invoices
 0057788a-9a65-4650-a383-c8f0d8a420f5
+
+WO completions
+ead8e438-129c-4f6f-a440-6280021d9762
+
+    f584fb11-d4ba-4ef4-9952-a7ad6c4ae992 ops_id auto_key
+    1c5a6805-6056-4f2e-9e18-f27e0dc71b2c c_datetime date_time
+    4270ed59-2683-4bd8-bd5a-01b419cf14cb lc_datetime date_time
+    ca76ecd8-6807-420a-a707-d52d42f59c75 lc_user account
+    37556133-a23e-4c4c-a0e8-f5f1abf85a57 c_user account
+    c72094ca-27a2-45db-85e7-3144d892ecc4 _project workspace
+    f5f5d9a8-c180-4ada-a1bc-055c87eb5365 task task
+    e66e72ce-4624-4108-b509-61568a041dd9 work_order_number string
+    cd7a0237-423c-4529-8d26-ee250775f976 status string
+    551cae39-4d68-4a40-b0cf-bbad882f4b5d total_material_cost number
+    a10f1667-0453-4b33-b7f0-d846744c7a3e total_hours number
+    fc164b66-e244-4b8f-8c79-f189738d8963 description_of_work string
+    48815d21-077d-4cef-b02e-de0c3acb8a89 asset string
+    1c159c89-b20f-4632-b20f-6e81fcd25aec type string
+    2fed0a51-a2ec-4178-92e7-c8edf826aaeb odometer_reading number
+    c6e44e25-6dd5-441e-bd2b-f7140f181874 engine_hours number
+    9783ccba-caeb-494b-8e13-55d57695861b total_invoice_cost number
+    fea802be-5bf2-4c14-83d6-530970b0a664 total_labor_cost number
+    1ecefece-dd3b-4677-a580-5b5efec88627 scheduled_services_included string
+
+
+
+Possibly Keep
+       Tool(
+            name="get_workspace_deficiencies",
+            description="Fetches all deficiencies for a given workspace and lists their status.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "workspace_name": {
+                        "type": "string",
+                        "description": "The name of the OpsReady workspace (e.g., 'Summit Base')."
+                    },
+                    "task_required": {
+                        "type": "boolean",
+                        "description": "Only return deficiencies with tasks associated to the, also use to check if a deficiency has a task linked to it"
+                    },
+                    "work_order_required": {
+                        "type": "boolean",
+                        "description": "Only return deficiencies with work orders linked to it and use to check if a deficiency has a work order linked to it"
+                    }
+                },
+                "required": ["workspace_name"]
+            }
+        ),
+
+
+                name_normalized = workspace_name.strip().lower()
+        workspace_name_to_loc = {
+                "summit base": "SUMMIT_BASE",
+                "ridgeview Base": "RIDGE_VIEW"
+            }
+
+    # get the location formatted name
+        workspace_loc = workspace_name_to_loc.get(name_normalized)
+        if workspace_loc:
+            return [
+                TextContent(
+                    type="text",
+                    text=f"I don't recognize the workspace '{workspace_name}'."
+                        " Try one of: " + ", ".join(workspace_name_to_loc.keys())
+                    )
+                ]

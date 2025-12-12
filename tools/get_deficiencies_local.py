@@ -1,9 +1,10 @@
-'''
+"""
 ******************************
 Working rn locally to return the deficiencies text, needed to update the api session
 function to get csrf too, need to implement this into claude
 ******************************
-'''
+"""
+
 import os
 from typing import List, Optional
 from dotenv import load_dotenv
@@ -83,7 +84,7 @@ session = get_api_session(st)
 
 
 # Get form access,
-form_access_id = "7f08e35a-9f0b-45ff-a554-7caff337f664" #defecincies form id
+form_access_id = "ead8e438-129c-4f6f-a440-6280021d9762" #defecincies form id
 access_url = f"{BASE_URL}/api/form/access/{form_access_id}"
 access_data = session.get(access_url).json()
 template_id = access_data.get("template_id")
@@ -107,13 +108,13 @@ query_body = {
             {
                 "$type": "string",
                 "operator": "equal",
-                "left": {"$type": "field", "field": "dc68de1b-8104-449b-8334-41c28e0e4c4d"},
-                "right": {"$type": "string", "value": "Unresolved"}
+                "left": {"$type": "field", "field": "f5f5d9a8-c180-4ada-a1bc-055c87eb5365"},
+                "right": {"$type": "task", "value": "Unresolved"}
             },
             {
                 "$type": "boolean",
                 "operator": "equal",
-                "left": {"$type": "field", "field": "archived"},
+                "left": {"$type": "archived"},
                 "right": {"$type": "boolean", "value": False}
             }
 

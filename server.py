@@ -13,6 +13,9 @@ from tools.tool_activity_feed import get_activity_feed
 from tools.tool_list_forms import get_workspace_forms_tool
 from tools.tool_get_asset_deficiencies import get_asset_deficiencies
 from tools.tool_work_orders import get_work_orders
+from tools.get_deficiency_details import get_deficiency_details
+from tools.tool_get_assets import get_assets
+from tools.tool_teams_tasks import get_team_tasks
 
 
 
@@ -139,6 +142,22 @@ Tool(
             }
         ),
         Tool(
+            name="get_team_tasks",
+            description=(
+                "Get the tasks that are assigned to a team. "
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "team_name": {
+                        "type": "string",
+                        "description": "The name of the team to get tasks from."
+                    }
+                },
+                "required": ["team_name"]
+            }
+        ),
+        Tool(
             name="get_activity_feed",
             description="Returns the most active users in a workspace, who has submitted forms, and most active ",
             inputSchema={
@@ -187,6 +206,20 @@ Tool(
             }
         ),
         Tool(
+            name="get_deficiency_details",
+            description="Fetches all details about a given deficiency, including task and work order info",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "deficiency_id": {
+                        "type": "string",
+                        "description": "The deficiency ID."
+                    }
+                },
+                "required": ["deficiency_id"]
+            }
+        ),
+        Tool(
             name="get_work_orders",
             description="Get work orders with optional status filter.",
             inputSchema={
@@ -199,11 +232,23 @@ Tool(
                 },
                 "required": []
             }
-        )
+        ),
+        Tool(
+            name="get_assets",
+            description="Fetches all assets from a workspace.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "workspace_name": {
+                        "type": "string",
+                        "description": "The workspace name."
+                    }
+                },
+                "required": ["workspace_name"]
+            }
+        ),
 
-
-
-         ]
+] #end tools
 
 
 @app.call_tool()
@@ -233,6 +278,12 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     elif name == "get_work_orders":
         status = arguments.get("status")
         return await get_work_orders(status=status)
+    elif name == "get_deficiency_details":
+        return await get_deficiency_details(arguments["deficiency_id"])
+    elif name == "get_assets":
+        return await get_assets(arguments["workspace_name"])
+    elif name == "get_team_tasks":
+        return await get_team_tasks(arguments["team_name"])
 
 
 

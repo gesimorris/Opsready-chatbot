@@ -85,9 +85,7 @@ def get_csrf_token(session):
     print("✔️ CSRF Token Found:", token)
     return token
 
-
-
-
+'''
 #throws not allowed for url error
 def get_workspace(session: requests.Session) -> Optional[Dict]:
     url = f"{BASE_URL}/api/workspace?limit=1000"
@@ -114,6 +112,7 @@ def get_workspace(session: requests.Session) -> Optional[Dict]:
     except requests.exceptions.RequestException as e:
         print("Failed to get workspace", e)
         return None
+'''
 
 if __name__ == "__main__":
     tgt = get_tgt(USERNAME, PASSWORD)

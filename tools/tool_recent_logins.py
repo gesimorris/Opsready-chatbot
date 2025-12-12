@@ -1,15 +1,14 @@
+"""
+Tool that takes a query like "Who has all signed in since 2025-05-01"
+Returns all the users that signed in to the site, how many times, and the time
+
+"""
 from datetime import datetime, timezone
 import os
 from dotenv import load_dotenv
 from mcp.types import TextContent
-from Unused.opsready import get_tgt, get_st, get_api_session
+from opsready import get_tgt, get_st, get_api_session
 
-"""
-This file is a tool called get_recent_login, it has a function get_recent_login that takes in the parameter
-since_data. This file is the logic that is called from server.py.
-
-
-"""
 
 load_dotenv()
 BASE_URL = "https://or-student-sandbox.opsready.com"

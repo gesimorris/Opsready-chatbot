@@ -1,14 +1,15 @@
+"""
+Backup/testing file for tool_get_asset_deficiencies
+Works the same just for trying new things
+
+"""
 import os
-from typing import List, Optional
+from typing import List
 from dotenv import load_dotenv
 from mcp.types import TextContent
-from Unused.opsready import get_tgt, get_st, get_api_session
-
-"""
-Working, need to add way to map creator_id to actual users name
+from opsready import get_tgt, get_st, get_api_session
 
 
-"""
 
 load_dotenv()
 BASE_URL = "https://or-student-sandbox.opsready.com"
