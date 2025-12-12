@@ -1,0 +1,72 @@
+NOT
+            "id": "ea5e178d-e1ac-4343-86bb-6191ff26bb7d",
+            "created": "2025-07-15T19:37:26.606Z",
+            "modified": "2025-07-15T19:37:26.606Z",
+            "creator_id": "8fd56def-f882-4532-8fc8-87e0dec576b8",
+            "workspace_id": "c7183960-edf4-4f00-8759-ac0f2d340dbb",
+            "$type": "workspace_feature_event",
+            "feature_id": "47737139-fede-4a1b-bba7-0ee606db5f1e",
+            "model_id": "c23b4acc-da9c-4a90-9b1c-efc45e474420",
+            "form_id": "abe863d1-7330-42f3-8266-bdd16caaa938",
+            "datasource_id": "3d8da80e-4ea4-46bc-9885-eb4cf699c34b",
+            "definition_id": "c23b4acc-da9c-4a90-9b1c-efc45e474420",
+            "revision_id": "6e51a38f-c982-4093-bdb3-e00fa51d4e91",
+            "feature_action": "ADD"
+
+
+
+
+        query_body = {
+            "references": True,
+            "filter": {
+                "operator": "equal",
+                "left": {
+                    "type": "field",
+                    "field": "dc68de1b-8104-449b-8334-41c28e0e4c4d"
+                },
+                "right": {
+                    "type": "string",
+                    "value": "unresolved"
+                }
+            },
+            "limit": 100,
+            "offset": 0
+        }
+        headers = {
+            "Accept": "application/json"
+        }
+
+        BELOW IS WORKING CLAUDE QUERY BODY T OGET UNRESOLVED
+
+                query_body = {
+            "filter": {
+                "$type": "string",
+                "operator": "equal",
+                "left": {"$type": "field", "field": "dc68de1b-8104-449b-8334-41c28e0e4c4d"},
+                "right": {"$type": "string", "value": "Unresolved"}
+            },
+            "limit": 20,
+        }
+
+
+
+        query_body = {
+    "filter": {
+        "$type": "composite",
+        "operator": "any",
+        "filters": [
+            {
+                "$type": "string",
+                "operator": "equal",
+                "left": {"$type": "field", "field": "dc68de1b-8104-449b-8334-41c28e0e4c4d"},
+                "right": {"$type": "string", "value": "Unresolved"}
+            },
+            {
+                "$type": "null",
+                "operator": "not_set",
+                "left": {"$type": "field", "field": "fc18ee38-1fc8-4ff4-8ff6-20e24580d622"}
+
+            }
+        ]
+    }
+}

@@ -1,0 +1,220 @@
+Asset Creation
+e7cd3852-634c-4e36-9d46-96829590b17b
+    Field_IDS
+    3aa5fd57-c501-4b7c-918c-015ae09d788f ops_asset_id auto_key
+    14ca213c-d989-4141-bda3-f2404977d090 c_datetime date_time
+    d465ec26-902c-408f-af2a-1335e0514547 lc_datetime date_time
+    7ff29527-4aae-4aa1-a55b-f764851db703 category string
+    c3c60b22-afbf-4d3d-9c4c-b23921f78226 type string
+    e1cff5b7-5d45-4135-8e87-7291fb5cd14e asset_number string
+    114e495d-7942-498a-a05d-3308603c376b order number
+    edbbc719-ce7b-4532-bfc9-8ea4b2d4ef7e maintenance_status string
+    75bbfb68-ced2-4d52-83e9-b6840fc1d5ad master string
+    7b5d58f6-9d54-4562-82e3-b1371c3d7be2 asset_display_field string
+    d9312e49-4ddd-44dc-beb4-4b18d89aecf0 c_user account
+    bb163657-41dd-4ee6-818f-e6b3a6f83b42 lc_user account
+    43288dc3-3352-4ef3-8c4f-69c35626a89b _project workspace
+    4e400ffd-3ca1-4d66-95fc-332367ecc068 serial_number string
+    e72929d5-8f7d-460b-9571-d925f6546252 availability_status string
+    605bc915-39d7-4ac1-aeea-44f881d0bf6b barcode barcode
+    657c3c9c-09d3-44e7-8f40-9acc66420065 category_and_type string
+    9bd96a6b-8d15-4f72-b480-2a160a82dbce assigned_personnel_string string
+    72871348-6a3b-4702-872a-daf904ae6669 dashboard_link string
+    0f02a24a-5fdd-4363-be96-3e6420ace729 wo_link string
+    4145d904-e7fb-419d-94bf-a75d45b25d8b deficiencies_link string
+    984904ed-6407-4b8a-b8d9-fee4d98e8804 transfer_request_link string
+    b6df53c3-77d8-4161-9879-88a56c52b873 new_deficiency_link string
+    943cdadd-e43b-4a20-b6f2-a9d804d3e82d asset_associations_link string
+    e3896d69-b2f0-433d-9766-6603d30e133a current_location string
+    88ace926-aa42-495f-9489-7e1c208462d7 photos file
+    bee0d545-a845-45d8-8c0a-2524a6cafab7 maintenance_status_comments string
+    c5dc3ee5-c71f-4841-8389-1d923c76b756 make string
+    be9a3452-afb1-4b10-b36b-037156b6e8a1 model string
+    09393baf-d477-4d6b-baf3-1bfc548ad4cc year string
+
+
+
+Asset List
+7f08e35a-9f0b-45ff-a554-7caff337f664
+
+    Field_IDS
+    3aa5fd57-c501-4b7c-918c-015ae09d788f ops_asset_id auto_key
+    14ca213c-d989-4141-bda3-f2404977d090 c_datetime date_time
+    d465ec26-902c-408f-af2a-1335e0514547 lc_datetime date_time
+    7ff29527-4aae-4aa1-a55b-f764851db703 category string
+    c3c60b22-afbf-4d3d-9c4c-b23921f78226 type string
+    e1cff5b7-5d45-4135-8e87-7291fb5cd14e asset_number string
+    114e495d-7942-498a-a05d-3308603c376b order number
+    edbbc719-ce7b-4532-bfc9-8ea4b2d4ef7e maintenance_status string
+    75bbfb68-ced2-4d52-83e9-b6840fc1d5ad master string
+    7b5d58f6-9d54-4562-82e3-b1371c3d7be2 asset_display_field string
+    d9312e49-4ddd-44dc-beb4-4b18d89aecf0 c_user account
+    bb163657-41dd-4ee6-818f-e6b3a6f83b42 lc_user account
+    43288dc3-3352-4ef3-8c4f-69c35626a89b _project workspace
+    4e400ffd-3ca1-4d66-95fc-332367ecc068 serial_number string
+    e72929d5-8f7d-460b-9571-d925f6546252 availability_status string
+    605bc915-39d7-4ac1-aeea-44f881d0bf6b barcode barcode
+    657c3c9c-09d3-44e7-8f40-9acc66420065 category_and_type string
+    9bd96a6b-8d15-4f72-b480-2a160a82dbce assigned_personnel_string string
+    72871348-6a3b-4702-872a-daf904ae6669 dashboard_link string
+    0f02a24a-5fdd-4363-be96-3e6420ace729 wo_link string
+    4145d904-e7fb-419d-94bf-a75d45b25d8b deficiencies_link string
+    984904ed-6407-4b8a-b8d9-fee4d98e8804 transfer_request_link string
+    b6df53c3-77d8-4161-9879-88a56c52b873 new_deficiency_link string
+    943cdadd-e43b-4a20-b6f2-a9d804d3e82d asset_associations_link string
+    e3896d69-b2f0-433d-9766-6603d30e133a current_location string
+    88ace926-aa42-495f-9489-7e1c208462d7 photos file
+    bee0d545-a845-45d8-8c0a-2524a6cafab7 maintenance_status_comments string
+    c5dc3ee5-c71f-4841-8389-1d923c76b756 make string
+    be9a3452-afb1-4b10-b36b-037156b6e8a1 model string
+    09393baf-d477-4d6b-baf3-1bfc548ad4cc year string
+
+Booster Station Hours:
+9102a7a3-56f4-4ad0-a4d1-f55d145d593f
+
+Booster Station Panel
+4fc0e09e-ee3d-416f-a170-cff56a812237
+
+Booster Station Walkaround
+4b158448-7352-4b98-bf42-4494a965588c
+
+Daily Inspections
+2cf90fcf-d774-47ad-9f82-dd98a1b1487a
+
+Deficiencies
+c27c33ba-75f8-432a-bd63-c4e361a52f67
+
+    Field_IDS
+    1fc8d85e-8098-4ab7-a332-22cca9fdab2f deficiency_id auto_key
+    63b1b206-ddbf-4fbe-b509-a0343afc7621 c_datetime date_time
+    84e4563f-603c-416e-8d49-0864d4ff70ca lc_datetime date_time
+    dc68de1b-8104-449b-8334-41c28e0e4c4d status string
+    36f37184-08c0-4075-a1a4-2fe5a6706022 actions_taken string
+    fc18ee38-1fc8-4ff4-8ff6-20e24580d622 date_completed date
+    a2a6db10-1d81-4e1c-a0d3-69b7e23875ea photos file
+    5aa89412-1f2e-4350-95fc-71d670a70609 comments string
+    29e11941-f4ed-4546-bac9-0824be88ab2b asset string
+    4da126f1-1881-4bff-a344-52df53df073b category string
+    7483694f-7f64-4dbc-9e10-a738ad9ad1e7 deficiency string
+    d5eb8827-b64f-4251-97a3-b40c475cca7b inspected_date date
+    f33c27b0-597e-446c-bb70-bc919add217c comments_from_inspection string
+    e27393d7-8d41-4cf1-b094-cfb453078568 asset_autokey string
+    4f48f4fd-daf2-4eb1-9309-a126f55d17c9 asset_feature_uuid string
+    6fddfb48-52ef-4f4a-9369-00e78db7b339 inspection_field_uuid string
+    c46ec951-3a1f-4ff5-9c9b-db4734228ef7 c_user account
+    b20e20d2-42ae-446e-a8b0-47ad58523cbb lc_user account
+    2640b788-861d-413b-a776-bbdae26b000c maintenance_completed_by account
+    e00dfdc2-7552-4760-a1eb-cde92f260819 _project workspace
+    fb1198c1-25c7-4690-acfa-bb99d3fbcee9 task task
+    6f006a77-21c0-4265-9e7f-eadb7e84d157 included_on_wo string
+    25ea0a22-5328-4340-b84a-3af43af6855e work_order_number string
+    2e9487cb-a4f9-423a-b3fb-d48a8231c2db deficiency_type string
+    2f359f40-c5db-4e6a-98b7-5e6258f9950e service_due string
+    79c6a2f0-2796-4f9b-a55d-99f4ccf31a8f schedule_id string
+
+    get defeciencies -> get the asset associated with -> check if task is associated with it
+
+Employee Labor
+abe863d1-7330-42f3-8266-bdd16caaa938
+
+    Field_IDS
+    27b3c572-4f3f-4c27-b3e9-608ff5d2921c labor_id auto_key
+    16e77d82-1e1a-4a5b-8863-fc2fba24d1ab c_datetime date_time
+    65d65f8a-44af-4eea-810a-3bc1a15d1a35 hours number
+    f03feaa1-78d6-42e8-8e4e-bf97e6edd8ae c_user account
+    dd196003-4e66-4b54-8c42-85808c02e97a employee account
+    f1088896-a826-4b2c-bd7c-17790b2ef07f _project workspace
+    c3b64116-7e88-4d9e-8fbe-eb9642e4792f task task
+    a0d81fd0-847b-4765-a6a5-a8130db72a1f c_date date
+    2d236682-2336-4860-bb6b-c828754c8ca8 cost number
+
+Materials Used
+37329c55-5d89-40b6-affc-90e6d16ebaf7
+
+    Field_IDS
+    5b393df1-6635-4eda-bba7-c196b3861534 material_id auto_key
+    434a16ab-f54d-4611-804c-c9bdc06a0d15 c_datetime date_time
+    95e64fa8-fb56-459e-8d57-de168517a024 material string
+    4b783927-958c-44bb-952b-00a77320d786 cost number
+    6105620c-04d3-43af-a64b-eca649ab4937 receipts file
+    530f6d4b-e0e9-46e9-b5b3-733748a15975 c_user account
+    d588b935-5309-46f0-a8c5-6646dfd26b8b _project workspace
+    86d0bbb1-7f20-4fe4-a9fb-1e79f84c259f task task
+    fe28bd49-6e99-4815-8b46-7f917924a4f4 select_from_list string
+    a7227eb0-3050-4cc2-9614-67c5cf36d208 other_material string
+    5ba2f878-2e60-4679-8c97-6b88e0ddff36 use_default_cost string
+    68d3da24-3fdb-4861-8a6a-b4d4141b8682 quantity number
+    45b1be88-aeba-4386-b8d9-a00fb85f144b total_cost number
+
+Progress Updates
+a7e15ab9-5124-492a-aa4d-0db503b1dd20
+
+Third Party Invoices
+0057788a-9a65-4650-a383-c8f0d8a420f5
+
+WO completions
+ead8e438-129c-4f6f-a440-6280021d9762
+
+    f584fb11-d4ba-4ef4-9952-a7ad6c4ae992 ops_id auto_key
+    1c5a6805-6056-4f2e-9e18-f27e0dc71b2c c_datetime date_time
+    4270ed59-2683-4bd8-bd5a-01b419cf14cb lc_datetime date_time
+    ca76ecd8-6807-420a-a707-d52d42f59c75 lc_user account
+    37556133-a23e-4c4c-a0e8-f5f1abf85a57 c_user account
+    c72094ca-27a2-45db-85e7-3144d892ecc4 _project workspace
+    f5f5d9a8-c180-4ada-a1bc-055c87eb5365 task task
+    e66e72ce-4624-4108-b509-61568a041dd9 work_order_number string
+    cd7a0237-423c-4529-8d26-ee250775f976 status string
+    551cae39-4d68-4a40-b0cf-bbad882f4b5d total_material_cost number
+    a10f1667-0453-4b33-b7f0-d846744c7a3e total_hours number
+    fc164b66-e244-4b8f-8c79-f189738d8963 description_of_work string
+    48815d21-077d-4cef-b02e-de0c3acb8a89 asset string
+    1c159c89-b20f-4632-b20f-6e81fcd25aec type string
+    2fed0a51-a2ec-4178-92e7-c8edf826aaeb odometer_reading number
+    c6e44e25-6dd5-441e-bd2b-f7140f181874 engine_hours number
+    9783ccba-caeb-494b-8e13-55d57695861b total_invoice_cost number
+    fea802be-5bf2-4c14-83d6-530970b0a664 total_labor_cost number
+    1ecefece-dd3b-4677-a580-5b5efec88627 scheduled_services_included string
+
+
+
+Possibly Keep
+       Tool(
+            name="get_workspace_deficiencies",
+            description="Fetches all deficiencies for a given workspace and lists their status.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "workspace_name": {
+                        "type": "string",
+                        "description": "The name of the OpsReady workspace (e.g., 'Summit Base')."
+                    },
+                    "task_required": {
+                        "type": "boolean",
+                        "description": "Only return deficiencies with tasks associated to the, also use to check if a deficiency has a task linked to it"
+                    },
+                    "work_order_required": {
+                        "type": "boolean",
+                        "description": "Only return deficiencies with work orders linked to it and use to check if a deficiency has a work order linked to it"
+                    }
+                },
+                "required": ["workspace_name"]
+            }
+        ),
+
+
+                name_normalized = workspace_name.strip().lower()
+        workspace_name_to_loc = {
+                "summit base": "SUMMIT_BASE",
+                "ridgeview Base": "RIDGE_VIEW"
+            }
+
+    # get the location formatted name
+        workspace_loc = workspace_name_to_loc.get(name_normalized)
+        if workspace_loc:
+            return [
+                TextContent(
+                    type="text",
+                    text=f"I don't recognize the workspace '{workspace_name}'."
+                        " Try one of: " + ", ".join(workspace_name_to_loc.keys())
+                    )
+                ]

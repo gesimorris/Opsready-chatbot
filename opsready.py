@@ -4,70 +4,16 @@ import requests
 from typing import Any, Dict, Optional
 from mcp.server.fastmcp import FastMCP
 
+
 load_dotenv()
 mcp = FastMCP("opsready")
 BASE_URL = "https://or-student-sandbox.opsready.com"
 USERNAME = os.getenv("OPSREADY_USERNAME")
 PASSWORD = os.getenv("OPSREADY_PASSWORD")
-'''
-def get_tgt(username: str, password: str) -> Optional[str]:
-    url = f"{BASE_URL}/cas/v1/tickets"
-    data = {"username": username, "password": password}
-    try:
-        response = requests.post(url, json=data)
-        response.raise_for_status()
-        tgt = response.json().get("tgt")
-        return tgt
-    except requests.exceptions.RequestException as e:
-        print("Failed to get TGT", e)
-        return None
-
-def get_st(tgt: str, service: str) -> Optional[str]:
-    url = f"{BASE_URL}/cas/v1/tickets/{tgt}"
-    params = {"service": service}
-    try:
-        response = requests.post(url, json=params)
-        response.raise_for_status()
-        st = response.json().get("st")
-        return st
-    except requests.exceptions.RequestException as e:
-        print("Failed to get ST", e)
-        return None
 
 
-def get_workspace(st: str) -> Optional[Dict]:
-    url = f"{BASE_URL}/api/workspace"
-    headers = {"Authorization": f"? {st}"}
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        try:
-            return response.json()
-        except ValueError:
-            print("Response not JSON:", response.text)
-            return None
-    except requests.exceptions.RequestException as e:
-        print("Failed to get workspace", e)
-        return None
 
-@mcp.tool()
-async def get_workspace_tool() ->str:
-    data = get_workspace()
-    if not data:
-        return "Failed to get workspace"
-
-    workspace_list = [f"{w.get('id', '?')}: {w.get('name', '?')}" for w in data.get("workspaces", [])]
-    return "\n".join(workspace_list) if workspace_list else "No workspaces found."
-
-
-if __name__ == "__main__":
-    #mcp.run(transport='stdio')
-    import asy
-
-
-'''
-load_dotenv()
-
+#recently works to get tgt and st not session
 #working
 def get_tgt(username: str, password: str) -> Optional[str]:
     url = f"{BASE_URL}/cas/v1/tickets"
@@ -83,6 +29,7 @@ def get_tgt(username: str, password: str) -> Optional[str]:
     except requests.exceptions.RequestException as e:
         print("Failed to get TGT", e)
         return None
+
 #working
 def get_st(tgt: str, service: str) -> Optional[str]:
     url = f"{BASE_URL}/cas/v1/tickets/{tgt}"
@@ -98,52 +45,100 @@ def get_st(tgt: str, service: str) -> Optional[str]:
         print("Failed to get ST", e)
         return None
 
-#working
-def get_api_session(st: str) -> Optional[requests.Session]:
+def get_api_session(st):
     url = f"{BASE_URL}/api/login?ticket={st}"
-    headers = {"Authorization": f"? {st}"}
-    try:
-        session = requests.Session()
-        response = session.get(url, headers=headers)
-        response.raise_for_status()
-        return session
-    except requests.exceptions.RequestException as e:
-        print("Failed to get API session", e)
-        return None
-    
-# Exchanging ST for a session cookie (NOT WORKING NEEDED FOR WORKSPACE CALL)
-def get_authenticated_session(service_url: str, st: str) -> requests.Session:
+    print(f"\n=== Login Request ===")
+    print(f"URL: {url}")
+
     session = requests.Session()
-    response = session.get(f"{service_url}?ticket={st}")
+    response = session.get(url)
+
+    print(f"Status Code: {response.status_code}")
+    print(f"Response Headers: {dict(response.headers)}")
+    print(f"Response Body: {response.text[:500]}")
+    print(f"Session Cookies: {session.cookies.get_dict()}")
+    print(f"===================\n")
+
     response.raise_for_status()
     return session
 
-#throws not allowed for url error
-def get_workspace(session: requests.Session) -> dict:
-    url = f"{BASE_URL}/api/workspace"
+def get_csrf_token(session):
+    url = f"{BASE_URL}/api/csrf_token"
+    print(f"\n=== CSRF Request ===")
+    print(f"URL: {url}")
+
     response = session.get(url)
-    response.raise_for_status()
-    return response.json()
 
+    print("Status Code:", response.status_code)
+    print("Headers:", dict(response.headers))
+    print("Raw Text Response:", response.text[:200])
+    print("Cookies:", session.cookies.get_dict())
+    print("====================\n")
 
-# MAIN
+    # CSRF token is stored in headers, NOT JSON
+    token = response.headers.get("X-CSRF-Token") or response.headers.get("x-csrf-token")
+
+    if not token:
+        print("⚠️ No CSRF token found in headers.")
+        return None
+
+    print("✔️ CSRF Token Found:", token)
+    return token
+
+'''
+#throws not allowed for url error
+def get_workspace(session: requests.Session) -> Optional[Dict]:
+    url = f"{BASE_URL}/api/workspace?limit=1000"
+    #headers = {"Authorization": f"? {st}"}
+
+    print(f"\n=== Workspace Request ===")
+    print(f"URL: {url}")
+    print(f"Session Cookies: {session.cookies.get_dict()}")
+
+    try:
+        response = session.get(url)
+        response.raise_for_status()
+
+        print(f"Status Code: {response.status_code}")
+        print(f"Response Headers: {dict(response.headers)}")
+        print(f"Response Body: {response.text[:500]}")
+        print(f"========================\n")
+
+        try:
+            return response.json()
+        except ValueError:
+            print("Response not JSON:", response.text)
+            return None
+    except requests.exceptions.RequestException as e:
+        print("Failed to get workspace", e)
+        return None
+'''
+
 if __name__ == "__main__":
     tgt = get_tgt(USERNAME, PASSWORD)
     if not tgt:
-        print("Failed to obtain TGT")
+        print("Failed to get TGT")
         exit(1)
-    print("TGT:", tgt)
-    st = get_st(tgt, f"{BASE_URL}/api/login")
+
+    service_url = f"{BASE_URL}/api/login"
+    st = get_st(tgt, service_url)
     if not st:
-        print("Failed to obtain ST")
+        print("Failed to get ST")
         exit(1)
-    print("ST:", st)
-    api_session = get_api_session(st)
-    if not api_session:
-        print("Failed to obtain API session")
+
+    session = get_api_session(st)
+    if not session:
+        print("Failed to create API session")
         exit(1)
-    print("API session: ", api_session)
+
+    csfr_token = get_csrf_token(session)
+    print("CSRF Token:", csfr_token)
+    if not csfr_token:
+        print("Failed to get CSRF token")
+        exit(1)
+
     
+
 
 
 
