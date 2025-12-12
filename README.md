@@ -11,7 +11,7 @@ Welcome to the OpsReady MCP Agent, a proof-of-concept AI assistant designed to h
 - [Technologies Used](#-technologies-used)
 - [Design & Architecture](#design--architecture)
 - [Prerequisites](#-prerequisites)
-- [Installation and Setup](#installation-and-setup)
+- [Installation and Setup](#%EF%B8%8F-installation-and-setup)
 - [Adding Tools](#adding-tools)
 - [Usage](#-usage)
 - [License](#-license)
