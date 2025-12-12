@@ -1,3 +1,23 @@
+"""
+opsready.py is our authentication file. It loads our sandbox credentials from .env file and uses them authenticate our demo account so the API calls can 
+be made.
+The methods:
+
+get_tgt(username, password):
+    responsible for getting the tgt from the opsready site, it calls the API to get the tgt, this is the first part of auth.
+
+get_st(tgt, service):
+    responsible for getting the st from the server. we have to provide the tgt before we can get the st. We also need to pass the service url which is the login
+    url.
+
+get_session(st):
+    we pass this method the st and it uses it to get the actual session that allows us to be able to pull data from APIs.
+
+get_csrf(session):
+    this method is neeed for when we are working with form submissions and need to get flex ids, we need to pass it the authenticated session we were
+    given and it returns us the csrf token
+
+"""
 import os
 from dotenv import load_dotenv
 import requests
@@ -79,10 +99,10 @@ def get_csrf_token(session):
     token = response.headers.get("X-CSRF-Token") or response.headers.get("x-csrf-token")
 
     if not token:
-        print("⚠️ No CSRF token found in headers.")
+        print("No CSRF token found in headers.")
         return None
 
-    print("✔️ CSRF Token Found:", token)
+    print(" CSRF Token Found:", token)
     return token
 
 '''
