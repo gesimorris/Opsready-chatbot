@@ -6,25 +6,25 @@ Welcome to the OpsReady MCP Agent, a proof-of-concept AI assistant designed to h
 
 ## 🧭 Table of Contents
 
-- [Introduction](#-introduction)
-- [Features](#-features)
-- [Technologies Used](#-technologies-used)
+- [Introduction](#introduction)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
 - [Design & Architecture](#design--architecture)
-- [Prerequisites](#-prerequisites)
-- [Installation and Setup](#%EF%B8%8F-installation-and-setup)
+- [Prerequisites](#prerequisites)
+- [Installation and Setup](#installation-and-setup)
 - [Adding Tools](#adding-tools)
-- [Usage](#-usage)
-- [License](#-license)
+- [Usage](#usage)
+- [License](#license)
 
 ---
 
-## ✨ Introduction
+## Introduction
 
 This project aims to make it simple and intuitive for companies using OpsReady to query and understand the operational data they generate. It demonstrates how an AI-powered agent, integrated through the MCP, can retrieve, interpret, and analyze large datasets through natural language—removing the need for manual data inspection.
 
 ---
 
-## 🚀 Features
+## Features
 
 - **Speech-to-Text Input**
   Hold the **LEFT SHIFT** key to record your voice. The recording is automatically transcribed and saved for the AI agent to read.
@@ -44,7 +44,7 @@ This project aims to make it simple and intuitive for companies using OpsReady t
 
 ---
 
-## 💻 Technologies Used
+## Technologies Used
 
 | Category | Component | Description |
 | :--- | :--- | :--- |
@@ -177,7 +177,7 @@ This code calls functions that are created in our opsready.py, which is responsi
 
 ---
 
-## ✅ Prerequisites
+## Prerequisites
 
 1.  **Internet Access**
 2.  **Python 3.10 or higher**: [Download Link](https://www.python.org/downloads/)
@@ -189,7 +189,7 @@ This code calls functions that are created in our opsready.py, which is responsi
 
 
 
-## ⚙️ Installation and Setup
+## Installation and Setup
 
 ### 1. Prepare the Environment & Install All Libraries
 
@@ -266,7 +266,7 @@ The voice feature requires system dependencies and compilation.
 
 ---
 
-## ▶️ Usage
+## Usage
 
 To utilize the tools, you must run two separate terminal sessions: one for the core server and one for the voice listener.
 
@@ -312,7 +312,7 @@ Use this template to add a new tool to Server.py. The tool description must be a
 ```
 
 
-## 📜 License
+## License
 
 ### Data Usage and Retrieval
 
