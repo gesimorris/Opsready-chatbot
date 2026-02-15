@@ -1,3 +1,6 @@
-mcp
-requests
-python-dotenv
+fastapi==0.115.5          # Web framework for the API
+uvicorn[standard]==0.32.1 # ASGI server to run FastAPI
+anthropic==0.40.0         # Claude API client
+python-dotenv==1.0.1      # Load environment variables from .env
+pydantic==2.10.3          # Data validation (used by FastAPI)
+requests==2.32.3          # HTTP requests (for OpsReady API calls)

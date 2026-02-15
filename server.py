@@ -16,7 +16,7 @@ from tools.tool_work_orders import get_work_orders
 from tools.get_deficiency_details import get_deficiency_details
 from tools.tool_get_assets import get_assets
 from tools.tool_teams_tasks import get_team_tasks
-
+from tools.tool_voice_input import get_voice_input
 
 
 """
@@ -247,6 +247,12 @@ Tool(
                 "required": ["workspace_name"]
             }
         ),
+        Tool(
+            name="get_voice_input",
+            description="Returns the most recent transcribed voice input.",
+            inputSchema={"type": "object", "properties": {}
+            }
+        ),
 
 ] #end tools
 
@@ -284,6 +290,8 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         return await get_assets(arguments["workspace_name"])
     elif name == "get_team_tasks":
         return await get_team_tasks(arguments["team_name"])
+    elif name == "get_voice_input":
+        return await get_voice_input()
 
 
 
