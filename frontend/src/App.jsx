@@ -70,7 +70,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/chat', {
+      const response = await fetch('https://opsready-chatbot-production.up.railway.app/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,6 +145,7 @@ function App() {
                 <li>👥 Team and workspace info</li>
               </ul>
               <p>Try asking: "Show me overdue tasks" or "What work orders are open?"</p>
+              <p>This is a demo with fake data. Mechanisms are the same</p>
             </div>
           ) : (
             messages.map((msg, index) => (

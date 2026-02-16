@@ -10,7 +10,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: black;
 }
 
 .App {
@@ -35,7 +35,7 @@ body {
 
 /* Header */
 .chat-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: black;
   color: white;
   padding: 20px 30px;
   display: flex;
@@ -83,7 +83,7 @@ body {
 }
 
 .welcome-message h2 {
-  color: #667eea;
+  color: black;
   margin-bottom: 20px;
   font-size: 28px;
 }
@@ -138,7 +138,7 @@ body {
 }
 
 .message.user .message-avatar {
-  background: #667eea;
+  background: black;
   margin-left: 10px;
 }
 
@@ -160,7 +160,7 @@ body {
 }
 
 .message.user .message-text {
-  background: #667eea;
+  background: black;
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -182,7 +182,7 @@ body {
 .typing-indicator span {
   width: 8px;
   height: 8px;
-  background: #667eea;
+  background: black
   border-radius: 50%;
   animation: bounce 1.4s infinite ease-in-out;
 }
@@ -233,7 +233,7 @@ textarea {
 
 textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: black
 }
 
 textarea:disabled {
@@ -278,7 +278,7 @@ textarea:disabled {
 }
 
 .send-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: black;
   color: white;
 }
 
@@ -303,12 +303,12 @@ textarea:disabled {
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-  background: #667eea;
+  background: gray;
   border-radius: 4px;
 }
 
 .messages-container::-webkit-scrollbar-thumb:hover {
-  background: #5568d3;
+  background: black;
 }
 
 /* Responsive */
