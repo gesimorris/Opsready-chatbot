@@ -3,7 +3,7 @@ from typing import List
 
 from dotenv import load_dotenv
 from mcp.types import TextContent
-from opsready import get_tgt, get_st, get_api_session
+from backend.opsready import get_tgt, get_st, get_api_session
 
 """
 Working, need to add way to map creator_id to actual users name

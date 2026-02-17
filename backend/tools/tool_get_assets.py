@@ -1,26 +1,15 @@
-"""
-***************************************
-Tool to get all the asset deficiencies that have been entered into forms by a user, from a specific workspace
-Takes query "Show me the deficiencies in Summit Base"
-Returns the deficiencies in that workspace
-
-Expand:
-- Deficiencies with no task assigned to them
-- Deficiencies with no WO
-***************************************
-"""
 import os
 from typing import List
 from dotenv import load_dotenv
 from mcp.types import TextContent
-from opsready import get_tgt, get_st, get_api_session
+from backend.opsready import get_tgt, get_st, get_api_session
 
 load_dotenv()
 BASE_URL = "https://or-student-sandbox.opsready.com"
 USERNAME = os.getenv("OPSREADY_USERNAME")
 PASSWORD = os.getenv("OPSREADY_PASSWORD")
 
-async def get_asset_deficiencies(workspace_name: str ) -> List[TextContent]:
+async def get_assets(workspace_name: str ) -> List[TextContent]:
     all_ws_url = f"{BASE_URL}/api/workspace?limit=50&offset=0&archived=false&order=_created,desc,,last&hidden=false"
 #auth
     try:
@@ -32,6 +21,7 @@ async def get_asset_deficiencies(workspace_name: str ) -> List[TextContent]:
         service_url = f"{BASE_URL}/api/login"
         st = get_st(tgt, service_url)
         session = get_api_session(st)
+
 #end auth
 
 #get session and all ws
@@ -48,8 +38,9 @@ async def get_asset_deficiencies(workspace_name: str ) -> List[TextContent]:
             return [TextContent(type="text", text="Failed to get workspace with that name")]
 
 
+
 #deficiencies form id, get the template id, get the flex id
-        form_access_id = "c27c33ba-75f8-432a-bd63-c4e361a52f67"
+        form_access_id = "7f08e35a-9f0b-45ff-a554-7caff337f664"
         access_url = f"{BASE_URL}/api/form/access/{form_access_id}"
         access_response = session.get(access_url)
         access_data = access_response.json()
@@ -64,50 +55,47 @@ async def get_asset_deficiencies(workspace_name: str ) -> List[TextContent]:
         if not flex_id:
             return [TextContent(type="text", text="Failed to get flex with that id")]
 
-#with flex id, can get the results based on the query below
         table_url = f"{BASE_URL}/api/table/{flex_id}/query"
         table_response = session.get(table_url)
         table_data = table_response.json()
+        workspace = "SUMMIT_BASE"
 
-#temp testing query, works
-        query_body = {
+        query = {
             "filter": {
                 "$type": "string",
                 "operator": "equal",
-                "left": {"$type": "field", "field": "dc68de1b-8104-449b-8334-41c28e0e4c4d"},
-                "right": {"$type": "string", "value": "Unresolved"}
-            }
-        }
-#query that gets the tasks where the field "e00..." (workspace) is workspace_id
-        query =  {
-            "filter": {
-                "$type": "id",
-                "operator": "equal",
-                "left": {"$type": "field", "field": "e00dfdc2-7552-4760-a1eb-cde92f260819"},
-                "right": {"$type": "id", "value": workspace_id}
+                "left": {"$type": "field", "field": "e3896d69-b2f0-433d-9766-6603d30e133a"},
+                "right": {"$type": "string", "value": workspace}
             }
         }
 
-#get the results
+        # get the results
         query_response = session.post(table_url, json=query)
         query_response.raise_for_status()
         results = query_response.json()
 
         res = results.get("results", [])
         if not res:
-            return [TextContent(type="text", text="No deficiencies found")]
+            return [TextContent(type="text", text="No assets found")]
 
-#loop through results, get the def name and status
-        lines = []
+        # loop through results, get the def name and status
+            # loop through results, get the def name and status
+        assets_output = []
         for i, record in enumerate(res, start=1):
             fields = record.get("fields", {})
-            deficiency = fields.get("7483694f-7f64-4dbc-9e10-a738ad9ad1e7", {}).get("value", "Unknown Deficiency")
-            id = fields.get("1fc8d85e-8098-4ab7-a332-22cca9fdab2f", {}.get("value", "Unknown ID"))
-            status = fields.get("dc68de1b-8104-449b-8334-41c28e0e4c4d", {}).get("value", "Unknown Status")
-            lines.append(f"{i}. {deficiency} — {status} - {id}")
+            asset_name = fields.get("7b5d58f6-9d54-4562-82e3-b1371c3d7be2", {}).get("value", "Unknown Asset")
+            asset_id = fields.get("3aa5fd57-c501-4b7c-918c-015ae09d788f", {}).get("value", "Unknown ID")
+            deficiency_link = fields.get("4145d904-e7fb-419d-94bf-a75d45b25d8b", {}).get("value", "Unknown Link")
+            deficiency_id = None
 
-        output = f"**Deficiencies in {workspace_name}:**\n" + "\n".join(lines)
+            if deficiency_link and isinstance(deficiency_link, str):
+                deficiency_id = deficiency_link.rstrip("/").split("/")[-1]
+            assets_output.append(f"{i}. {asset_id} — {asset_name} - {deficiency_id}")
+
+
+        output = f"**Deficiencies in {workspace_name}:**\n" + "\n".join(assets_output)
         return [TextContent(type="text", text=output)]
+        #return [TextContent(type="json", text=json.dumps(assets_output, indent=2))]
 
 
     except Exception as e:

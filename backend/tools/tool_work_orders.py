@@ -4,7 +4,7 @@ import sys
 from typing import List, Optional
 from dotenv import load_dotenv
 from mcp.types import TextContent
-from opsready import get_tgt, get_st, get_api_session, get_csrf_token
+from backend.opsready import get_tgt, get_st, get_api_session, get_csrf_token
 
 load_dotenv()
 BASE_URL = "https://or-student-sandbox.opsready.com"

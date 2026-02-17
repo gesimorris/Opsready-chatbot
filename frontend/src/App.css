@@ -182,7 +182,7 @@ body {
 .typing-indicator span {
   width: 8px;
   height: 8px;
-  background: black
+  background: black;
   border-radius: 50%;
   animation: bounce 1.4s infinite ease-in-out;
 }

@@ -1,8 +1,10 @@
+## This project is split into two phases. Phase 1 was worked on as a capstone project with two other team members. Phase 2 was worked on independetly by me. ##
+
 # Phase 1
 
-# 🤖 OPSREADY MCP AGENT
+# OPSREADY MCP AGENT
 
-Welcome to the OpsReady MCP Agent, a proof-of-concept AI assistant designed to help organizations effortlessly understand and interact with their operational data. This project blends modern AI, backend engineering, and the **Model Context Protocol (MCP)** to create a seamless, natural-language interface for querying and analyzing real-world operational datasets.
+Welcome to the OpsReady MCP Agent, a proof-of-concept AI assistant designed to help organizations effortlessly understand and interact with their operational data. This project blends modern AI, backend engineering, and the Model Context Protocol (MCP) to create a seamless, natural-language interface for querying and analyzing real-world operational datasets.
 
 ---
 
@@ -28,9 +30,6 @@ This project aims to make it simple and intuitive for companies using OpsReady t
 
 ## Features
 
-- **Speech-to-Text Input**
-  Hold the **LEFT SHIFT** key to record your voice. The recording is automatically transcribed and saved for the AI agent to read.
-
 - **OpsReady Tools Integration**
   The AI agent can interact with various OpsReady endpoints to retrieve operational data:
   | Tool Function | Description |
@@ -52,13 +51,12 @@ This project aims to make it simple and intuitive for companies using OpsReady t
 | :--- | :--- | :--- |
 | **Backend & Core** | Python 3.10+, fastmcp, requests, dotenv | Main backend language, MCP framework, API communication, credential management. |
 | **AI Integration** | Model Context Protocol (MCP), Claude Desktop App | Connects your local tools to the AI interface. |
-| **Voice Input** | Whisper.cpp, pynput, sounddevice, scipy, numpy | Local speech-to-text engine, key detection, audio capture, and file processing. |
 
 ---
 
 ## Design & Architecture
 
-There are two main components to the MCP System we designed. There is a Server.py file that connects our backend tools to Claude, and then there is a Tools folder which contains all of our tools.
+There are two main components to the MCP System we designed. There is a server.py file that connects our backend tools to Claude, and then there is a Tools folder which contains all of our tools.
 
 ### Server.py
 Server.py is exposed to Claude through a path saved in Claudes config file (more on this in Installation Section). The servers role is to define all of our tools in JSON Schema formatting. There is a python fucntion called list_tools() that contains all of the tools that Claude can access. @app.list_tool() as seen in the first line of the code sample below, is MCP's way of telling the model, in our case Claude, what the available tools are.
@@ -82,6 +80,7 @@ async def list_tools() -> list[Tool]:
                 "required": ["since_date"]
             }
         ),
+    ]
 
 ```
 Server.py also contains a python function to call the tools called call_tools(). The function tells Claude to call this function when it wants to execute a tool by including @app.call_tool(), then Claude passes the tool name it wants to execute and any paramaters like workspace name to the function. 
@@ -190,7 +189,6 @@ This code calls functions that are created in our opsready.py, which is responsi
 ---
 
 
-
 ## Installation and Setup
 
 ### 1. Prepare the Environment & Install All Libraries
@@ -198,50 +196,10 @@ This code calls functions that are created in our opsready.py, which is responsi
 1.  **Download** the repository and navigate to the project folder.
 2.  Run this single command to install all Python libraries needed for the core server and voice listener:
     ```bash
-    pip install mcp python-dotenv requests typing sounddevice scipy numpy pynput
+    pip install mcp python-dotenv requests typing pynput
     ```
 
-### 2. Voice Input Engine Setup (Whisper.cpp)
-
-The voice feature requires system dependencies and compilation.
-
-#### 2A. Install System Dependencies (CMake & FFmpeg)
-
-| Operating System | Action | Command/Instructions |
-| :--- | :--- | :--- |
-| **macOS** | Use Homebrew to install packages: | `brew install cmake ffmpeg` |
-| **Linux (Debian/Ubuntu)** | Use the `apt` package manager: | `sudo apt update && sudo apt install cmake ffmpeg` |
-| **Windows** | **Manual Installation and PATH Configuration:** | **[See Detailed Windows Steps Below]** |
-
-##### **Windows Detailed Installation Steps**
-
-1.  **CMake:** Download and install the Windows x64 Installer from [cmake.org]. **CRUCIAL:** Select **"Add CMake to system PATH for all users"** during installation.
-2.  **FFmpeg:** Download a recent Windows build (e.g., from Gyan). Unzip the folder to a stable location (e.g., `C:\ffmpeg`).
-3.  **Configure PATH:** You must add the path to the FFmpeg `/bin` directory (e.g., `C:\ffmpeg\bin`) to your Windows **system environment variables** (under **Path** variable).
-
-#### 2B. Compile Whisper
-
-*Run these commands from the root of your project directory.*
-
-1.  Download the Whisper source code:
-    ```bash
-    git submodule update --init --recursive
-    ```
-2.  Compile the executable:
-    ```bash
-    cd background/whisper.cpp
-    mkdir build && cd build
-    cmake ..
-    make
-    ```
-3.  Download the language model:
-    ```bash
-    cd ../models
-    curl -O [https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin](https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin)
-    ```
-4.  **Verify Paths:** The Python tools expect these files to be present: `background/whisper.cpp/build/bin/whisper-cli` and `background/whisper.cpp/models/ggml-base.en.bin`.
-
-### 3. Authentication & Configuration
+### 2. Authentication & Configuration
 
 1.  **Authentication:** In the project root, create a file named **`.env`** and add your credentials:
     ```env
@@ -274,17 +232,15 @@ To utilize the tools, you must run two separate terminal sessions: one for the c
 
 | Component | Command | Location |
 | :--- | :--- | :--- |
-| **1. Core MCP Server** | `python3 server.py` | Project Root Directory |
-| **2. Voice Listener** | `python3 background/voice_output.py` | Project Root Directory |
+| **Core MCP Server** | `python3 server.py` | Project Root Directory |
 
 ### Command Input
 
 | Method | Action | Example |
 | :--- | :--- | :--- |
-| **Voice Command** | Hold **LEFT SHIFT** to speak. Release to transcribe. Then, type `"Get voice input"` into the Claude chat box. | *Query:* "List all assets." *Claude Input:* `Get voice input` |
 | **Text Input** | Directly type your query into the Claude chat box. | `Open workorders for Summit Base` |
 
-> **Stop Servers:** Stop both running servers using **CTRL + C** in their respective terminal windows.
+> **Stop Servers:** Stop running servers using **CTRL + C** in their respective terminal windows.
 
 ---
 
@@ -385,54 +341,97 @@ All operational data, credentials, and configuration accessed through the OpsRea
 
 # Phase 2
 
-# OpsReady AI Chatbot
+The goal of this phase was to create a frontend for users to use instead of directly interacting with Claude. There was the limiation that I lost access to the student-sandbox account so cannot access the data. So for this I decided to build two versions. Version A that works with a username and password for sandbox but can't be tested. Version B that works using mock data provided by myself that can be tested. Version A is the api_server.py file and Version B is main.py.
 
-An AI-powered chatbot for querying and managing OpsReady workplace operations data. Built with FastAPI (Python backend) + React (frontend) + Claude API.
-
-## 🎯 Features
-
-- **Real-time Data Access**: Query tasks, work orders, deficiencies, assets, and more
-- **Natural Language Interface**: Ask questions in plain English
-- **Voice Input**: Use speech-to-text for hands-free queries
-- **14+ Tools**: Comprehensive access to OpsReady data
-- **Agentic AI**: Claude automatically calls the right tools to answer your questions
 
 ## 🏗️ Architecture
 
 ```
-React Frontend (Port 3000)
+React Frontend
     ↓ HTTP
-FastAPI Backend (Port 8000)
+FastAPI Backend
     ↓ Anthropic API
 Claude Sonnet 4
     ↓ Tool Calls
 OpsReady API (Python tools)
 ```
+Browsers enforce a Same-Origin Policy. Since the frontend is hosted on vercel.app and the backend is on a different domain, the browser naturally blocks the frontend from reaching out to a different server to fetch data. 
 
-## 📁 Project Structure
+The CORSMiddleware acts as an "Access Control List." It tells the browser: "I trust requests coming from these specific Vercel and Localhost URLs, so please allow them to read my responses."
 
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # React dev
+        "http://localhost:5173",  # Vite dev
+        "https://*.vercel.app",   # Vercel deployment
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 ```
-opsready-chatbot/
-├── api_server.py          # FastAPI backend with Claude integration
-├── opsready.py            # OpsReady authentication
-├── server.py              # Old MCP server (for reference)
-├── requirements.txt       # Python dependencies
-├── .env                   # Environment variables (create this)
-├── tools/                 # All OpsReady API tool functions
-│   ├── tool_recent_logins.py
-│   ├── tool_get_user_tasks.py
-│   ├── tool_get_overdue_tasks.py
-│   ├── tool_work_orders.py
-│   └── ... (14+ tools)
-└── opsready-frontend/     # React chat interface
-    ├── package.json
-    ├── vite.config.js
-    ├── index.html
-    └── src/
-        ├── App.jsx        # Main chat component
-        ├── App.css        # Styles
-        ├── main.jsx       # Entry point
-        └── index.css
+I implemented these Pydantic models to define a strict schema for the chat interface. By using ChatMessage and ChatResponse, the API can automatically validate that incoming user messages and the conversation_history are formatted correctly before any processing happens. Since LLMs are 'stateless', I chose a List[Dict] structure to store the rolling history of the conversation. This allows the frontend to pass the entire context back to the server with every new message, ensuring the AI maintains a coherent and continuous dialogue."
+
+```python
+class ChatMessage(BaseModel):
+    message: str
+    conversation_history: Optional[List[Dict[str, Any]]] = []
+
+class ChatResponse(BaseModel):
+    response: str
+    conversation_history: List[Dict[str, Any]]
+```
+The tool setup needed to be changed to fit the Claude API instead of MCP
+
+```python
+TOOLS = [
+    {
+        "name": "get_recent_logins",
+        "description": "Returns users who have logged in since a certain date (YYYY-MM-DD)",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "since_date": {
+                    "type": "string",
+                    "description": "Date in YYYY-MM-DD format"
+                }
+            },
+            "required": ["since_date"]
+        }
+    },
+```
+
+### POST /api/chat
+Main chat endpoint. Sends message to Claude, executes tools, returns response.
+
+**Request:**
+```json
+{
+  "message": "Show me overdue tasks",
+  "conversation_history": []
+}
+```
+
+**Response:**
+```json
+{
+  "response": "Here are the overdue tasks...",
+  "conversation_history": [...]
+}
+```
+
+### GET /api/health
+Health check endpoint.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-02-14T...",
+  "tools_available": 14
+}
 ```
 
 ## 🚀 Setup Instructions
@@ -462,10 +461,14 @@ BASE_URL=https://or-student-sandbox.opsready.com
 
 ```bash
 # Install Python dependencies
+cd backend
 pip install -r requirements.txt
 
 # Run the FastAPI server
 python api_server.py
+or
+# Run mock demo
+python main.py
 
 # Server will start on http://localhost:8000
 # Check health: http://localhost:8000/api/health
@@ -475,7 +478,7 @@ python api_server.py
 
 ```bash
 # Navigate to frontend directory
-cd opsready-frontend
+cd frontend
 
 # Install dependencies
 npm install
@@ -525,169 +528,6 @@ The chatbot has access to 14+ tools:
 - `get_recent_logins` - User login history
 - `get_activity_feed` - Workspace activity
 - `get_workspace_forms` - Forms list
-
-## 🚢 Deployment
-
-### Backend Deployment (Railway/Render)
-
-**Railway:**
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-
-# Login and deploy
-railway login
-railway init
-railway up
-
-# Add environment variables in Railway dashboard
-```
-
-**Render:**
-1. Push code to GitHub
-2. Create new Web Service on Render
-3. Connect repository
-4. Build command: `pip install -r requirements.txt`
-5. Start command: `uvicorn api_server:app --host 0.0.0.0 --port $PORT`
-6. Add environment variables in Render dashboard
-
-### Frontend Deployment (Vercel)
-
-```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Navigate to frontend directory
-cd opsready-frontend
-
-# Deploy
-vercel
-
-# Update API URL in App.jsx to your deployed backend URL
-```
-
-**Or use Vercel Dashboard:**
-1. Push code to GitHub
-2. Import project in Vercel
-3. Set root directory to `opsready-frontend`
-4. Deploy
-
-**Important:** Update the API URL in `App.jsx`:
-```javascript
-// Change from:
-const response = await fetch('http://localhost:8000/api/chat', ...
-
-// To:
-const response = await fetch('https://your-backend-url.railway.app/api/chat', ...
-```
-
-## 🎤 Voice Input
-
-Voice input uses the Web Speech API (Chrome, Edge, Safari only):
-- Click the microphone button 🎤
-- Speak your question
-- Click again to stop recording (or it auto-stops)
-- Your speech is converted to text
-
-## 🐛 Troubleshooting
-
-### Backend Issues
-
-**"Failed to get TGT"**
-- Check `.env` file has correct OpsReady credentials
-- Verify BASE_URL is correct
-
-**"ANTHROPIC_API_KEY not found"**
-- Add your API key to `.env` file
-- Get one at: https://console.anthropic.com/
-
-**CORS errors:**
-- Make sure backend `CORSMiddleware` allows your frontend origin
-- Update `allow_origins` in `api_server.py` if deploying to custom domain
-
-### Frontend Issues
-
-**"Failed to fetch" / Network error:**
-- Ensure backend is running on port 8000
-- Check console for exact error message
-- Verify firewall isn't blocking port 8000
-
-**Voice input not working:**
-- Only works in Chrome, Edge, Safari (not Firefox)
-- Requires HTTPS in production (HTTP okay for localhost)
-- Check browser permissions for microphone access
-
-## 📊 API Endpoints
-
-### POST /api/chat
-Main chat endpoint. Sends message to Claude, executes tools, returns response.
-
-**Request:**
-```json
-{
-  "message": "Show me overdue tasks",
-  "conversation_history": []
-}
-```
-
-**Response:**
-```json
-{
-  "response": "Here are the overdue tasks...",
-  "conversation_history": [...]
-}
-```
-
-### GET /api/health
-Health check endpoint.
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-02-14T...",
-  "tools_available": 14
-}
-```
-
-## 🔐 Security Notes
-
-- **Never commit `.env` file** - Add to `.gitignore`
-- **OpsReady credentials** are stored in `.env` only
-- **API keys** should be kept secret
-- **CORS** is configured for localhost dev - update for production
-
-## 📝 Development Notes
-
-### Adding New Tools
-
-1. Create tool function in `tools/tool_name.py`
-2. Import in `api_server.py`
-3. Add tool definition to `TOOLS` array
-4. Add case in `call_tool_function()`
-
-### Modifying System Prompt
-
-Edit `SYSTEM_PROMPT` in `api_server.py` to change Claude's behavior.
-
-### Styling Changes
-
-Edit `opsready-frontend/src/App.css` for UI changes.
-
-## 📄 License
-
-Private project for portfolio demonstration.
-
-## 🎓 Built For
-
-Full-stack developer portfolio demonstrating:
-- Python backend development
-- React frontend development
-- AI/LLM integration
-- RESTful API design
-- Real-world tool integration
-
----
 
 **Live Demo:** https://opsready-chatbot.vercel.app
 **GitHub:** https://github.com/gesimorris/Opsready-chatbot

@@ -137,12 +137,12 @@ function App() {
               <h2>👋 Welcome to OpsReady AI</h2>
               <p>I can help you with:</p>
               <ul>
-                <li>📋 Viewing and managing tasks</li>
-                <li>🔧 Checking work orders</li>
-                <li>⚠️ Tracking deficiencies</li>
-                <li>📦 Managing assets</li>
-                <li>📊 Generating reports</li>
-                <li>👥 Team and workspace info</li>
+                <li>Viewing and managing tasks</li>
+                <li>Checking work orders</li>
+                <li>Tracking deficiencies</li>
+                <li>Managing assets</li>
+                <li>Generating reports</li>
+                <li>Team and workspace info</li>
               </ul>
               <p>Try asking: "Show me overdue tasks" or "What work orders are open?"</p>
               <p>This is a demo with fake data. Mechanisms are the same</p>

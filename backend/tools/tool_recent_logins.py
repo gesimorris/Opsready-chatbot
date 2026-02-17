@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 import os
 from dotenv import load_dotenv
 from mcp.types import TextContent
-from opsready import get_tgt, get_st, get_api_session
+from backend.opsready import get_tgt, get_st, get_api_session
 
 
 load_dotenv()

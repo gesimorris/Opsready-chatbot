@@ -1,6 +1,6 @@
 """
-Mock OpsReady API Server for Portfolio Demo
-No real credentials needed - returns realistic fake data
+Mock OpsReady API Server
+returns realistic fake data
 """
 import os
 from typing import List, Dict, Any, Optional
@@ -40,7 +40,7 @@ class ChatResponse(BaseModel):
     response: str
     conversation_history: List[Dict[str, Any]]
 
-# MOCK DATA - Realistic fake data for demo
+# MOCK DATA
 MOCK_TASKS = [
     {
         "title": "Inspect Fire Extinguishers - Building A",

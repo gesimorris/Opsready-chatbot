@@ -12,10 +12,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import anthropic
 
-# Add tools directory to path
+
 sys.path.append(os.path.dirname(__file__))
 
-# Import all tool functions
+
 from tools.tool_recent_logins import get_recent_logins
 from tools.tool_get_user_tasks import get_user_tasks
 from tools.tool_debug_tasks_sample import get_task_sample
@@ -36,7 +36,7 @@ load_dotenv()
 # Initialize FastAPI
 app = FastAPI(title="OpsReady Chatbot API")
 
-# CORS Configuration - allow React frontend
+# CORS Configuration for React frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
