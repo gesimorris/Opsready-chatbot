@@ -529,8 +529,6 @@ The chatbot has access to 14+ tools:
 - `get_activity_feed` - Workspace activity
 - `get_workspace_forms` - Forms list
 
-**Live Demo:** https://opsready-chatbot.vercel.app
-**GitHub:** https://github.com/gesimorris/Opsready-chatbot
 
 
 
