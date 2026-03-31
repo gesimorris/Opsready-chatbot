@@ -17,13 +17,8 @@ app = FastAPI(title="OpsReady Chatbot API (Mock)")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://opsready-chatbot.vercel.app",
-        "https://opsready-chatbot-git-main-gesimorris-projects.vercel.app",
-        "https://opsready-chatbot-fmh6u5xr8-gesimorris-projects.vercel.app"
-    ],
-    allow_origin_regex=r"https://opsready-chatbot.*\.vercel\.app", 
+    allow_origins=["*"],
+    allow_origin_regex=r"https://opsready-chatbot.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -292,7 +287,6 @@ async def chat(request: ChatMessage):
         messages = request.conversation_history if request.conversation_history else []
         messages.append({"role": "user", "content": request.message})
         
-        # Consistent model use to prevent Tier errors
         active_model = "claude-3-haiku-20240307"
 
         response = client.messages.create(
@@ -304,7 +298,7 @@ async def chat(request: ChatMessage):
         )
         
         while response.stop_reason == "tool_use":
-            # Add assistant's tool request to history
+            # Convert Claude's Tool Use block into a dict for history
             messages.append({"role": "assistant", "content": response.content})
             
             tool_results = []
@@ -327,21 +321,21 @@ async def chat(request: ChatMessage):
                 messages=messages
             )
         
-        final_response_text = ""
+        final_text = ""
         for block in response.content:
-            if hasattr(block, 'text'):
-                final_response_text += block.text
+            if block.type == "text":
+                final_text += block.text
         
-        messages.append({"role": "assistant", "content": final_response_text})
+        messages.append({"role": "assistant", "content": final_text})
         
         return ChatResponse(
-            response=final_response_text,
+            response=final_text,
             conversation_history=messages
         )
 
     except Exception as e:
         print(f"Detailed Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
     
 @app.get("/api/health")
 async def health_check():
@@ -351,4 +345,3 @@ async def health_check():
         "timestamp": datetime.now().isoformat(),
         "tools_available": len(TOOLS)
     }
-

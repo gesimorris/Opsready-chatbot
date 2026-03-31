@@ -69,7 +69,8 @@ function App() {
       setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
       setConversationHistory(data.conversation_history);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Connection error. Check backend." }]);
+      console.error("Fetch Error:", error);
+      setMessages(prev => [...prev, { role: 'assistant', content: "API Error: Please check the browser console for details." }]);
     } finally {
       setIsLoading(false);
     }
