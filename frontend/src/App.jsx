@@ -56,7 +56,10 @@ function App() {
     setIsLoading(true);
     
     try {
-      const updatedHistory = [...conversationHistory, { role: 'user', content: userMessage }];
+      // FIX 1: Ensure conversationHistory is an array before spreading
+      const currentHistory = Array.isArray(conversationHistory) ? conversationHistory : [];
+      const updatedHistory = [...currentHistory, { role: 'user', content: userMessage }];
+      
       const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,12 +68,22 @@ function App() {
           conversation_history: updatedHistory
         })
       });
+  
+      if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+      }
+  
       const data = await response.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
-      setConversationHistory(data.conversation_history);
+  
+      // FIX 2: Check if data.response and data.conversation_history exist
+      if (data && data.response) {
+        setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+        // Ensure we always save an array, never null
+        setConversationHistory(data.conversation_history || []);
+      }
     } catch (error) {
       console.error("Fetch Error:", error);
-      setMessages(prev => [...prev, { role: 'assistant', content: "API Error: Please check the browser console for details." }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: "Connection error. Check backend logs." }]);
     } finally {
       setIsLoading(false);
     }
