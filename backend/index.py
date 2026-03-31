@@ -17,10 +17,7 @@ app = FastAPI(title="OpsReady Chatbot API (Mock)")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://opsready-chatbot.vercel.app"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -279,15 +276,21 @@ async def call_tool_function(tool_name: str, tool_input: Dict[str, Any]) -> str:
     except Exception as e:
         return f"Error executing {tool_name}: {str(e)}"
 
+@app.get("/")
+async def root():
+    return {"status": "OpsReady Backend Live"}
+
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatMessage):
     try:
-        messages = request.conversation_history + [
-            {"role": "user", "content": request.message}
-        ]
+        messages = request.conversation_history if request.conversation_history else []
+        messages.append({"role": "user", "content": request.message})
         
+        # Consistent model use to prevent Tier errors
+        active_model = "claude-3-haiku-20240307"
+
         response = client.messages.create(
-            model="claude-3-haiku-20240307",
+            model=active_model,
             max_tokens=4096,
             system=SYSTEM_PROMPT,
             tools=TOOLS,
@@ -295,6 +298,7 @@ async def chat(request: ChatMessage):
         )
         
         while response.stop_reason == "tool_use":
+            # Add assistant's tool request to history
             messages.append({"role": "assistant", "content": response.content})
             
             tool_results = []
@@ -310,22 +314,22 @@ async def chat(request: ChatMessage):
             messages.append({"role": "user", "content": tool_results})
             
             response = client.messages.create(
-                model="claude-3-5-sonnet-20240620",
+                model=active_model,
                 max_tokens=4096,
                 system=SYSTEM_PROMPT,
                 tools=TOOLS,
                 messages=messages
             )
         
-        final_response = ""
+        final_response_text = ""
         for block in response.content:
             if hasattr(block, 'text'):
-                final_response += block.text
+                final_response_text += block.text
         
-        messages.append({"role": "assistant", "content": final_response})
+        messages.append({"role": "assistant", "content": final_response_text})
         
         return ChatResponse(
-            response=final_response,
+            response=final_response_text,
             conversation_history=messages
         )
 
