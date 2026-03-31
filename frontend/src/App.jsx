@@ -14,6 +14,8 @@ function App() {
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
 
+  const API_BASE_URL = 'https://opsready-chatbot-d7i9.vercel.app';
+
   const tasks = [
     { title: "Inspect Fire Extinguishers - Building A", assigned: "Sarah Johnson", status: "In Progress", priority: "PRIORITY" },
     { title: "Replace HVAC Filters - Floor 3", assigned: "Mike Chen", status: "Open", priority: "ROUTINE" },
@@ -55,7 +57,7 @@ function App() {
     
     try {
       const updatedHistory = [...conversationHistory, { role: 'user', content: userMessage }];
-      const response = await fetch('http://localhost:8000/api/chat', {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -109,7 +111,9 @@ function App() {
                 <td>{t.title}</td>
                 <td>{t.assigned}</td>
                 <td><span className={`badge ${t.status.toLowerCase().replace(' ', '-')}`}>{t.status}</span></td>
-                <td className={t.priority === 'EMERGENCY' ? 'text-red' : ''}>{t.priority}</td>
+                <td style={{ color: t.priority === 'EMERGENCY' ? '#991b1b' : 'inherit', fontWeight: t.priority === 'EMERGENCY' ? 'bold' : 'normal' }}>
+                {t.priority}
+                </td>
               </tr>
             ))}
           </tbody>
