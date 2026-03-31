@@ -15,7 +15,6 @@ load_dotenv()
 
 app = FastAPI(title="OpsReady Chatbot API (Mock)")
 
-# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -28,10 +27,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Anthropic client
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-# Pydantic models
 class ChatMessage(BaseModel):
     message: str
     conversation_history: Optional[List[Dict[str, Any]]] = []
@@ -193,7 +190,7 @@ async def mock_recent_logins(since_date: str) -> str:
 - mike.chen@opsready.com (2024-01-19)
 - david.martinez@opsready.com (2024-01-18)"""
 
-# Tool definitions for Claude
+
 TOOLS = [
     {
         "name": "get_overdue_tasks",
@@ -285,38 +282,36 @@ async def call_tool_function(tool_name: str, tool_input: Dict[str, Any]) -> str:
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatMessage):
-    """Main chat endpoint"""
     try:
         messages = request.conversation_history + [
             {"role": "user", "content": request.message}
         ]
         
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-3-haiku-20240307",
             max_tokens=4096,
             system=SYSTEM_PROMPT,
             tools=TOOLS,
             messages=messages
         )
         
-        # Handle tool use (agentic loop)
         while response.stop_reason == "tool_use":
-            tool_use_blocks = [block for block in response.content if block.type == "tool_use"]
+            messages.append({"role": "assistant", "content": response.content})
             
             tool_results = []
-            for tool_use in tool_use_blocks:
-                tool_result = await call_tool_function(tool_use.name, tool_use.input)
-                tool_results.append({
-                    "type": "tool_result",
-                    "tool_use_id": tool_use.id,
-                    "content": tool_result
-                })
+            for block in response.content:
+                if block.type == "tool_use":
+                    result = await call_tool_function(block.name, block.input)
+                    tool_results.append({
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": result
+                    })
             
-            messages.append({"role": "assistant", "content": response.content})
             messages.append({"role": "user", "content": tool_results})
             
             response = client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-3-5-sonnet-20240620",
                 max_tokens=4096,
                 system=SYSTEM_PROMPT,
                 tools=TOOLS,
@@ -334,10 +329,11 @@ async def chat(request: ChatMessage):
             response=final_response,
             conversation_history=messages
         )
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
+    except Exception as e:
+        print(f"Detailed Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+    
 @app.get("/api/health")
 async def health_check():
     """Health check"""

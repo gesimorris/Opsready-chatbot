@@ -33,26 +33,22 @@ from tools.tool_teams_tasks import get_team_tasks
 
 load_dotenv()
 
-# Initialize FastAPI
 app = FastAPI(title="OpsReady Chatbot API")
 
-# CORS Configuration for React frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",  # React dev
-        "http://localhost:5173",  # Vite dev
-        "https://*.vercel.app",   # Vercel deployment
+        "http://localhost:3000",
+        "http://localhost:5173", 
+        "https://*.vercel.app",   
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Initialize Anthropic client
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-# Pydantic models
 class ChatMessage(BaseModel):
     message: str
     conversation_history: Optional[List[Dict[str, Any]]] = []
@@ -61,7 +57,7 @@ class ChatResponse(BaseModel):
     response: str
     conversation_history: List[Dict[str, Any]]
 
-# Tool definitions for Claude API (converted from MCP format)
+
 TOOLS = [
     {
         "name": "get_recent_logins",
@@ -300,7 +296,6 @@ async def call_tool_function(tool_name: str, tool_input: Dict[str, Any]) -> str:
         else:
             return f"Unknown tool: {tool_name}"
         
-        # Extract text from TextContent objects
         if isinstance(result, list):
             return "\n".join([item.text for item in result if hasattr(item, 'text')])
         return str(result)
@@ -312,12 +307,10 @@ async def call_tool_function(tool_name: str, tool_input: Dict[str, Any]) -> str:
 async def chat(request: ChatMessage):
     """Main chat endpoint - processes user message with Claude and tool execution"""
     try:
-        # Build conversation history
         messages = request.conversation_history + [
             {"role": "user", "content": request.message}
         ]
         
-        # Initial Claude API call
         response = client.messages.create(
             model="claude-sonnet-4-20250514",
             max_tokens=4096,
@@ -326,12 +319,9 @@ async def chat(request: ChatMessage):
             messages=messages
         )
         
-        # Handle tool use (agentic loop)
         while response.stop_reason == "tool_use":
-            # Extract tool calls
             tool_use_blocks = [block for block in response.content if block.type == "tool_use"]
             
-            # Execute each tool
             tool_results = []
             for tool_use in tool_use_blocks:
                 tool_result = await call_tool_function(tool_use.name, tool_use.input)
@@ -341,11 +331,9 @@ async def chat(request: ChatMessage):
                     "content": tool_result
                 })
             
-            # Add assistant response and tool results to conversation
             messages.append({"role": "assistant", "content": response.content})
             messages.append({"role": "user", "content": tool_results})
             
-            # Continue conversation with tool results
             response = client.messages.create(
                 model="claude-sonnet-4-20250514",
                 max_tokens=4096,
@@ -354,13 +342,11 @@ async def chat(request: ChatMessage):
                 messages=messages
             )
         
-        # Extract final text response
         final_response = ""
         for block in response.content:
             if hasattr(block, 'text'):
                 final_response += block.text
         
-        # Update conversation history
         messages.append({"role": "assistant", "content": final_response})
         
         return ChatResponse(

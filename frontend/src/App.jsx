@@ -2,214 +2,171 @@ import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
 
 function App() {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [conversationHistory, setConversationHistory] = useState([]);
+  
+  
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
 
-  // Initialize Speech Recognition
+  const tasks = [
+    { title: "Inspect Fire Extinguishers - Building A", assigned: "Sarah Johnson", status: "In Progress", priority: "PRIORITY" },
+    { title: "Replace HVAC Filters - Floor 3", assigned: "Mike Chen", status: "Open", priority: "ROUTINE" },
+    { title: "Emergency Exit Sign Repair", assigned: "Unassigned", status: "Open", priority: "EMERGENCY" },
+    { title: "Monthly Safety Inspection", assigned: "David Martinez", status: "Complete", priority: "ROUTINE" },
+    { title: "Boiler Maintenance Check", assigned: "Sarah Johnson", status: "Open", priority: "PRIORITY" }
+  ];
+  
+  const workOrders = [
+    { number: "WO-2024-001", asset: "Plumbing System", status: "Open", desc: "Leaking pipe in basement" },
+    { number: "WO-2024-002", asset: "Elevator - Main", status: "Closed", desc: "Maintenance completed" }
+  ];
+  
+  const deficiencies = [
+    { id: "DEF-001", name: "Cracked window in lobby", status: "Unresolved" },
+    { id: "DEF-002", name: "Broken door handle - Room 205", status: "Unresolved" }
+  ];
+
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
-      recognitionRef.current.lang = 'en-US';
-
       recognitionRef.current.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setInputValue(transcript);
-        setIsRecording(false);
-      };
-
-      recognitionRef.current.onerror = () => {
-        setIsRecording(false);
-      };
-
-      recognitionRef.current.onend = () => {
+        setInputValue(event.results[0][0].transcript);
         setIsRecording(false);
       };
     }
   }, []);
 
-  // Auto-scroll to bottom
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleVoiceInput = () => {
-    if (!recognitionRef.current) {
-      alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
-      return;
-    }
-
-    if (isRecording) {
-      recognitionRef.current.stop();
-      setIsRecording(false);
-    } else {
-      recognitionRef.current.start();
-      setIsRecording(true);
-    }
-  };
+  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  useEffect(() => { scrollToBottom(); }, [messages]);
 
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
-
     const userMessage = inputValue.trim();
     setInputValue('');
-
-    // Add user message to UI
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
-
+    
     try {
-      const response = await fetch('https://opsready-chatbot-production.up.railway.app/api/chat', {
+      const updatedHistory = [...conversationHistory, { role: 'user', content: userMessage }];
+      const response = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessage,
-          conversation_history: conversationHistory
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          message: userMessage, 
+          conversation_history: updatedHistory
         })
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
-
-      // Add AI response to UI
       setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
-      
-      // Update conversation history for context
       setConversationHistory(data.conversation_history);
-
     } catch (error) {
-      console.error('Error:', error);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: `Error: ${error.message}. Make sure the backend server is running on http://localhost:8000` 
-      }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: "Connection error. Check backend." }]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
-  const clearChat = () => {
-    setMessages([]);
-    setConversationHistory([]);
-  };
-
   return (
-    <div className="App">
-      <div className="chat-container">
-        {/* Header */}
-        <div className="chat-header">
-          <div className="header-content">
-            <h1>OpsReady AI Assistant</h1>
-            <p>Ask about tasks, work orders, assets, and more</p>
+    <div className="dashboard-wrapper">
+      <nav className="side-nav">
+        <div className="logo">OpsReady</div>
+        <ul>
+          <li className="active">Dashboard</li>
+          <li>Assets</li>
+          <li>Work Orders</li>
+          <li>Team</li>
+        </ul>
+      </nav>
+
+      <main className="main-content">
+      <header className="top-bar">
+        <h2>Facility Overview: Building A</h2>
+        <div className="user-profile">👤 Gesi Morris-Odubo</div>
+      </header>
+
+      <section className="stats-grid">
+        <div className="stat-card"><h3>{tasks.length}</h3><p>Active Tasks</p></div>
+        <div className="stat-card"><h3>{workOrders.length}</h3><p>Open Orders</p></div>
+        <div className="stat-card warning"><h3>{deficiencies.length}</h3><p>Deficiencies</p></div>
+      </section>
+
+      <section className="data-table">
+        <h3>Maintenance Schedule</h3>
+        <table>
+          <thead>
+            <tr><th>Task</th><th>Assigned To</th><th>Status</th><th>Priority</th></tr>
+          </thead>
+          <tbody>
+            {tasks.map((t, i) => (
+              <tr key={i}>
+                <td>{t.title}</td>
+                <td>{t.assigned}</td>
+                <td><span className={`badge ${t.status.toLowerCase().replace(' ', '-')}`}>{t.status}</span></td>
+                <td className={t.priority === 'EMERGENCY' ? 'text-red' : ''}>{t.priority}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="data-table" style={{ marginTop: '20px' }}>
+        <h3>System Work Orders</h3>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Asset</th><th>Description</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            {workOrders.map((wo, i) => (
+              <tr key={i}>
+                <td>{wo.number}</td>
+                <td>{wo.asset}</td>
+                <td>{wo.desc}</td>
+                <td><span className={`badge ${wo.status.toLowerCase()}`}>{wo.status}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+      <button className="chat-trigger" onClick={() => setIsChatOpen(!isChatOpen)}>
+        {isChatOpen ? '✕' : '!'}
+      </button>
+
+      {isChatOpen && (
+        <div className="chat-widget">
+          <div className="chat-header">
+            <h4>OpsReady AI Assistant</h4>
+            <span>Online</span>
           </div>
-          <button onClick={clearChat} className="clear-button">
-            Clear Chat
-          </button>
-        </div>
-
-        {/* Messages Area */}
-        <div className="messages-container">
-          {messages.length === 0 ? (
-            <div className="welcome-message">
-              <h2>👋 Welcome to OpsReady AI</h2>
-              <p>I can help you with:</p>
-              <ul>
-                <li>Viewing and managing tasks</li>
-                <li>Checking work orders</li>
-                <li>Tracking deficiencies</li>
-                <li>Managing assets</li>
-                <li>Generating reports</li>
-                <li>Team and workspace info</li>
-              </ul>
-              <p>Try asking: "Show me overdue tasks" or "What work orders are open?"</p>
-              <p>This is a demo with fake data. Mechanisms are the same</p>
-            </div>
-          ) : (
-            messages.map((msg, index) => (
-              <div key={index} className={`message ${msg.role}`}>
-                <div className="message-avatar">
-                  {msg.role === 'user' ? '👤' : '🤖'}
-                </div>
-                <div className="message-content">
-                  <div className="message-text">
-                    {msg.content.split('\n').map((line, i) => (
-                      <React.Fragment key={i}>
-                        {line}
-                        {i < msg.content.split('\n').length - 1 && <br />}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-          {isLoading && (
-            <div className="message assistant">
-              <div className="message-avatar">🤖</div>
-              <div className="message-content">
-                <div className="typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <div className="input-container">
-          <div className="input-wrapper">
-            <textarea
-              value={inputValue}
+          <div className="messages-area">
+            {messages.length === 0 ? (
+              <div className="welcome">How can I help with facility operations today?</div>
+            ) : (
+              messages.map((msg, i) => (
+                <div key={i} className={`msg-bubble ${msg.role}`}>{msg.content}</div>
+              ))
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+          <div className="chat-input-row">
+            <input 
+              value={inputValue} 
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message or use voice input..."
-              disabled={isLoading}
-              rows="1"
+              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              placeholder="Ask OpsReady..."
             />
-            <button
-              onClick={handleVoiceInput}
-              className={`voice-button ${isRecording ? 'recording' : ''}`}
-              disabled={isLoading}
-              title={isRecording ? 'Stop recording' : 'Start voice input'}
-            >
-              {isRecording ? '🔴' : '🎤'}
-            </button>
-            <button
-              onClick={sendMessage}
-              disabled={isLoading || !inputValue.trim()}
-              className="send-button"
-            >
-              {isLoading ? '⏳' : '➤'}
-            </button>
+            <button onClick={sendMessage}>➤</button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
