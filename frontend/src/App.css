@@ -1,7 +1,6 @@
 :root {
-  /* Industrial Color Palette */
-  --primary: #0f172a;       /* Deep Navy / Charcoal */
-  --accent: #eab308;        /* Safety Yellow */
+  --primary: #0f172a;     
+  --accent: #eab308;      
   --success: #166534;
   --danger: #991b1b;
   --bg-surface: #ffffff;
@@ -20,12 +19,11 @@
   color: var(--text-main);
 }
 
-/* Sidebar: Solid, Utilitarian */
 .side-nav { 
   width: 220px; 
   background: var(--primary); 
   color: #f8fafc; 
-  padding: 0; /* Flush to edges */
+  padding: 0;
   border-right: 1px solid #000;
 }
 .logo {
@@ -50,7 +48,6 @@
   border-left: 4px solid var(--accent); 
 }
 
-/* Main Content: High Contrast Grid */
 .main-content { flex: 1; padding: 25px; overflow-y: auto; }
 .top-bar { 
   display: flex; 
@@ -73,7 +70,6 @@
 .stat-card p { font-weight: 600; color: #64748b; text-transform: uppercase; font-size: 0.75rem; }
 .stat-card.warning { border: 2px solid var(--danger); background: #fef2f2; }
 
-/* Table: Clean, Bordered */
 .data-table { 
   margin-top: 25px;
   background: white; 
@@ -85,7 +81,6 @@ th { background: #f8fafc; text-transform: uppercase; font-size: 0.7rem; color: #
 th, td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); }
 tr:hover { background: #f8fafc; }
 
-/* Badge: Flat & Solid */
 .badge { 
   padding: 2px 6px; 
   font-weight: 700; 
@@ -95,7 +90,6 @@ tr:hover { background: #f8fafc; }
 }
 .badge.open { color: var(--success); }
 
-/* Chat: "Terminal-Lite" Feel */
 .chat-trigger {
   position: fixed; bottom: 25px; right: 25px;
   width: 50px; height: 50px; border-radius: 4px;
@@ -121,7 +115,6 @@ tr:hover { background: #f8fafc; }
   display: flex; flex-direction: column; gap: 12px;
 }
 
-/* Bubbles: Boxy, no roundness */
 .msg-bubble { 
   padding: 12px; 
   font-size: 0.9rem; 
@@ -135,7 +128,7 @@ tr:hover { background: #f8fafc; }
 .chat-input-row { padding: 12px; background: #f8fafc; border-top: 1px solid var(--border-color); display: flex; gap: 8px; }
 .chat-input-row input { 
   flex: 1; border: 1px solid var(--border-color); padding: 10px; border-radius: 0; 
-  font-family: monospace; /* Optional: adds to industrial feel */
+  font-family: monospace;
 }
 .chat-input-row button { 
   background: var(--primary); color: var(--accent); border: none; padding: 0 15px; cursor: pointer; font-weight: bold;

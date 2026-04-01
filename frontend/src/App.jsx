@@ -56,7 +56,6 @@ function App() {
     setIsLoading(true);
     
     try {
-      // FIX 1: Ensure conversationHistory is an array before spreading
       const currentHistory = Array.isArray(conversationHistory) ? conversationHistory : [];
       const updatedHistory = [...currentHistory, { role: 'user', content: userMessage }];
       
@@ -75,10 +74,8 @@ function App() {
   
       const data = await response.json();
   
-      // FIX 2: Check if data.response and data.conversation_history exist
       if (data && data.response) {
         setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
-        // Ensure we always save an array, never null
         setConversationHistory(data.conversation_history || []);
       }
     } catch (error) {
