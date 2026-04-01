@@ -17,10 +17,10 @@ app = FastAPI(title="OpsReady Chatbot API (Mock)")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Direct match for simple requests
-    allow_origin_regex=r"https://opsready-chatbot.*\.vercel\.app", # Matches all your preview/prod domains
+    allow_origins=["*"], 
+    allow_origin_regex=r"https://opsready-chatbot.*\.vercel\.app", 
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
