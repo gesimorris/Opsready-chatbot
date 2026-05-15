@@ -1,19 +1,19 @@
 """
-Mock OpsReady API Server
-returns realistic fake data
+OpsReady Chatbot API Server - Mock Demo Mode
+Fully synchronized with frontend data structures and updated for Claude Haiku 4.5.
 """
 import os
 from typing import List, Dict, Any, Optional
-from datetime import datetime, timedelta
+from datetime import datetime
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import anthropic
-from dotenv import load_dotenv
 
 load_dotenv()
 
-app = FastAPI(title="OpsReady Chatbot API (Mock)")
+app = FastAPI(title="OpsReady Chatbot API (Demo)")
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,6 +26,8 @@ app.add_middleware(
 
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
+MODEL_ID = "claude-haiku-4-5-20251001"
+
 class ChatMessage(BaseModel):
     message: str
     conversation_history: Optional[List[Dict[str, Any]]] = []
@@ -34,263 +36,96 @@ class ChatResponse(BaseModel):
     response: str
     conversation_history: List[Dict[str, Any]]
 
-# MOCK DATA
-MOCK_TASKS = [
-    {
-        "title": "Inspect Fire Extinguishers - Building A",
-        "assigned_to": {"name": "Sarah Johnson"},
-        "status": "In Progress",
-        "due_date": (datetime.now() - timedelta(days=2)).isoformat(),
-        "priority": "PRIORITY"
-    },
-    {
-        "title": "Replace HVAC Filters - Floor 3",
-        "assigned_to": {"name": "Mike Chen"},
-        "status": "Open",
-        "due_date": (datetime.now() + timedelta(days=5)).isoformat(),
-        "priority": "ROUTINE"
-    },
-    {
-        "title": "Emergency Exit Sign Repair",
-        "assigned_to": None,
-        "status": "Open",
-        "due_date": (datetime.now() - timedelta(days=1)).isoformat(),
-        "priority": "EMERGENCY"
-    },
-    {
-        "title": "Monthly Safety Inspection",
-        "assigned_to": {"name": "David Martinez"},
-        "status": "Complete",
-        "due_date": (datetime.now() - timedelta(days=10)).isoformat(),
-        "priority": "ROUTINE"
-    },
-    {
-        "title": "Boiler Maintenance Check",
-        "assigned_to": {"name": "Sarah Johnson"},
-        "status": "Open",
-        "due_date": (datetime.now() + timedelta(days=3)).isoformat(),
-        "priority": "PRIORITY"
-    }
-]
-
-MOCK_WORK_ORDERS = [
-    {
-        "number": "WO-2024-001",
-        "workspace": "Summit Base",
-        "status": "Open",
-        "description": "Leaking pipe in basement",
-        "asset": "Plumbing System - Building A",
-        "created": "2024-01-15"
-    },
-    {
-        "number": "WO-2024-002",
-        "workspace": "North Station",
-        "status": "Closed",
-        "description": "Elevator maintenance completed",
-        "asset": "Elevator - Main Building",
-        "created": "2024-01-10"
-    }
-]
-
-MOCK_DEFICIENCIES = [
-    {"name": "Cracked window in lobby", "status": "Unresolved", "id": "DEF-001"},
-    {"name": "Broken door handle - Room 205", "status": "Unresolved", "id": "DEF-002"},
-    {"name": "Water stain on ceiling", "status": "Resolved", "id": "DEF-003"}
-]
-
-# Mock tool functions that return realistic data
-async def mock_get_overdue_tasks() -> str:
-    overdue = [t for t in MOCK_TASKS if datetime.fromisoformat(t["due_date"]) < datetime.now()]
-    if not overdue:
-        return "No overdue tasks found."
-    
-    lines = [f"Overdue tasks as of {datetime.now().strftime('%Y-%m-%d')}:"]
-    for t in overdue:
-        assigned = t["assigned_to"]["name"] if t["assigned_to"] else "Unassigned"
-        lines.append(f"- {t['title']} | Assigned: {assigned} | Due: {t['due_date'][:10]}")
-    lines.append(f"\nTotal overdue: {len(overdue)}")
-    return "\n".join(lines)
-
-async def mock_get_task_summary() -> str:
-    total = len(MOCK_TASKS)
-    assigned = sum(1 for t in MOCK_TASKS if t["assigned_to"])
-    unassigned = total - assigned
-    overdue = sum(1 for t in MOCK_TASKS if datetime.fromisoformat(t["due_date"]) < datetime.now())
-    
-    return f"""📊 OpsReady Task Summary Report
-
-Total tasks: {total}
-Assigned: {assigned}
-Unassigned: {unassigned}
-Overdue: {overdue}
-Due soon (next 7 days): 2
-
-Top task categories:
-- Inspection: 2
-- Maintenance: 2
-- Repair: 1
-
-Key insights:
-• There are overdue tasks requiring attention.
-• Several tasks are approaching their due dates.
-
-✅ Summary complete."""
-
-async def mock_get_work_orders(status: Optional[str] = None) -> str:
-    orders = MOCK_WORK_ORDERS
-    if status:
-        orders = [w for w in orders if w["status"].lower() == status.lower()]
-    
-    if not orders:
-        return "No work orders found."
-    
-    lines = []
-    for wo in orders:
-        lines.append(f"""Work Order: {wo['number']}
-Workspace: {wo['workspace']}
-Status: {wo['status']}
-Description: {wo['description']}
-Asset: {wo['asset']}
-Date Created: {wo['created']}
----------------------------------------""")
-    return "\n".join(lines)
-
-async def mock_get_deficiencies(workspace: str) -> str:
-    return f"""**Deficiencies in {workspace}:**
-1. Cracked window in lobby — Unresolved - DEF-001
-2. Broken door handle - Room 205 — Unresolved - DEF-002
-3. Water stain on ceiling — Resolved - DEF-003"""
-
-async def mock_get_user_tasks(identifier: str) -> str:
-    user_tasks = [t for t in MOCK_TASKS if t["assigned_to"] and identifier.lower() in t["assigned_to"]["name"].lower()]
-    if not user_tasks:
-        return f"No tasks found for '{identifier}'."
-    
-    lines = [f"Tasks assigned to {identifier}:"]
-    for t in user_tasks:
-        lines.append(f"- {t['title']} | Status: {t['status']} | Due: {t['due_date'][:10]}")
-    return "\n".join(lines)
-
-async def mock_get_all_assigned_users() -> str:
-    from collections import Counter
-    users = [t["assigned_to"]["name"] for t in MOCK_TASKS if t["assigned_to"]]
-    counts = Counter(users).most_common()
-    
-    lines = ["Users with assigned tasks:\n"]
-    for name, count in counts:
-        lines.append(f"- {name}: {count} task(s)")
-    return "\n".join(lines)
-
-async def mock_recent_logins(since_date: str) -> str:
-    return f"""Users logged in since {since_date}:
-- sarah.johnson@opsready.com (2024-01-20)
-- mike.chen@opsready.com (2024-01-19)
-- david.martinez@opsready.com (2024-01-18)"""
-
-
+# =====================================================================
+#                          MCP TOOL SCHEMAS
+# =====================================================================
 TOOLS = [
     {
-        "name": "get_overdue_tasks",
-        "description": "List all tasks whose due date is before today",
-        "input_schema": {"type": "object", "properties": {}}
-    },
-    {
-        "name": "get_task_summary_report",
-        "description": "Generate a summary report of all tasks: total, assigned/unassigned, overdue, due soon",
-        "input_schema": {"type": "object", "properties": {}}
-    },
-    {
-        "name": "get_work_orders",
-        "description": "Get work orders with optional status filter",
+        "name": "get_maintenance_schedule",
+        "description": "Returns all active facility maintenance tasks, priorities, statuses, and assignees.",
         "input_schema": {
             "type": "object",
-            "properties": {
-                "status": {"type": "string", "description": "Status filter (e.g., 'Open', 'Closed')"}
-            }
+            "properties": {}
         }
     },
     {
-        "name": "get_workspace_deficiencies",
-        "description": "Get all deficiencies for a workspace",
+        "name": "get_system_work_orders",
+        "description": "Fetches high-level tracking data for active system work orders.",
         "input_schema": {
             "type": "object",
-            "properties": {
-                "workspace_name": {"type": "string", "description": "Workspace name"}
-            },
-            "required": ["workspace_name"]
+            "properties": {}
         }
     },
     {
-        "name": "get_user_tasks",
-        "description": "Get all tasks assigned to a specific user",
+        "name": "get_facility_deficiencies",
+        "description": "Lists structural, aesthetic, or immediate physical facility deficiencies.",
         "input_schema": {
             "type": "object",
-            "properties": {
-                "identifier": {"type": "string", "description": "User name or email"}
-            },
-            "required": ["identifier"]
-        }
-    },
-    {
-        "name": "get_all_assigned_users",
-        "description": "List all users with tasks and their task counts",
-        "input_schema": {"type": "object", "properties": {}}
-    },
-    {
-        "name": "get_recent_logins",
-        "description": "Get users who logged in since a date (YYYY-MM-DD)",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "since_date": {"type": "string", "description": "Date in YYYY-MM-DD format"}
-            },
-            "required": ["since_date"]
+            "properties": {}
         }
     }
 ]
 
-SYSTEM_PROMPT = """You are an AI assistant for OpsReady, a workplace operations management platform. You help users query and manage tasks, work orders, deficiencies, and assets.
+SYSTEM_PROMPT = """You are an AI assistant for OpsReady, a workplace operations management platform. 
+You assist facility operators with tracking maintenance schedules, work orders, and open structural deficiencies.
 
-IMPORTANT: This is a demo version with mock data for portfolio purposes. The data you're accessing is realistic but fake.
+Your dashboard context contains real-time operational logs. When users ask questions about active operations, use your tools to provide data that matches exactly what they see on screen.
 
-Be helpful, concise, and professional. Format data clearly using markdown when appropriate."""
+Be helpful, concise, and professional. 
+
+CRITICAL FORMATTING RULE: Whenever you return lists of tasks, work orders, or deficiencies, you MUST format the data as a clean Markdown table with clear column headers (e.g., ID, Asset, Status). If a table cannot be used, format the data using clean, bolded bullet points. Do not wrap data inside dense paragraphs."""
+
+# =====================================================================
+#             SYNCHRONIZED INLINE MOCK OPERATIONAL DATA
+# =====================================================================
 
 async def call_tool_function(tool_name: str, tool_input: Dict[str, Any]) -> str:
-    """Execute mock tool functions"""
+    """Provides exact mock structural alignment with React state arrays"""
     try:
-        if tool_name == "get_overdue_tasks":
-            return await mock_get_overdue_tasks()
-        elif tool_name == "get_task_summary_report":
-            return await mock_get_task_summary()
-        elif tool_name == "get_work_orders":
-            return await mock_get_work_orders(tool_input.get("status"))
-        elif tool_name == "get_workspace_deficiencies":
-            return await mock_get_deficiencies(tool_input["workspace_name"])
-        elif tool_name == "get_user_tasks":
-            return await mock_get_user_tasks(tool_input["identifier"])
-        elif tool_name == "get_all_assigned_users":
-            return await mock_get_all_assigned_users()
-        elif tool_name == "get_recent_logins":
-            return await mock_recent_logins(tool_input["since_date"])
+        if tool_name == "get_maintenance_schedule":
+            return (
+                "Active Maintenance Tasks:\n"
+                "- **Inspect Fire Extinguishers - Building A** | Assigned to: Sarah Johnson | Status: In Progress | Priority: PRIORITY\n"
+                "- **Replace HVAC Filters - Floor 3** | Assigned to: Mike Chen | Status: Open | Priority: ROUTINE\n"
+                "- **Emergency Exit Sign Repair** | Assigned to: Unassigned | Status: Open | Priority: EMERGENCY\n"
+                "- **Monthly Safety Inspection** | Assigned to: David Martinez | Status: Complete | Priority: ROUTINE\n"
+                "- **Boiler Maintenance Check** | Assigned to: Sarah Johnson | Status: Open | Priority: PRIORITY"
+            )
+            
+        elif tool_name == "get_system_work_orders":
+            return (
+                "System Work Orders:\n"
+                "- **WO-2024-001**: Plumbing System - Leaking pipe in basement | Status: Open\n"
+                "- **WO-2024-002**: Elevator - Main - Maintenance completed | Status: Closed"
+            )
+            
+        elif tool_name == "get_facility_deficiencies":
+            return (
+                "Unresolved Facility Deficiencies:\n"
+                "- **DEF-001**: Cracked window in lobby | Status: Unresolved\n"
+                "- **DEF-002**: Broken door handle - Room 205 | Status: Unresolved"
+            )
+            
         else:
-            return f"Unknown tool: {tool_name}"
+            return f"Unknown core service: {tool_name}"
+            
     except Exception as e:
-        return f"Error executing {tool_name}: {str(e)}"
+        return f"Error executing data pipe mock: {str(e)}"
 
-@app.get("/")
-async def root():
-    return {"status": "OpsReady Backend Live"}
+# =====================================================================
+#                        CHAT ROUTING PIPELINE
+# =====================================================================
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatMessage):
+    """Processes chat cycles using updated model configurations and inline data tools"""
     try:
-        messages = request.conversation_history if request.conversation_history else []
-        messages.append({"role": "user", "content": request.message})
+        messages = request.conversation_history + [
+            {"role": "user", "content": request.message}
+        ]
         
-        active_model = "claude-3-haiku-20240307"
-
         response = client.messages.create(
-            model=active_model,
+            model=MODEL_ID,
             max_tokens=4096,
             system=SYSTEM_PROMPT,
             tools=TOOLS,
@@ -298,50 +133,52 @@ async def chat(request: ChatMessage):
         )
         
         while response.stop_reason == "tool_use":
-            # Convert Claude's Tool Use block into a dict for history
-            messages.append({"role": "assistant", "content": response.content})
+            tool_use_blocks = [block for block in response.content if block.type == "tool_use"]
             
             tool_results = []
-            for block in response.content:
-                if block.type == "tool_use":
-                    result = await call_tool_function(block.name, block.input)
-                    tool_results.append({
-                        "type": "tool_result",
-                        "tool_use_id": block.id,
-                        "content": result
-                    })
+            for tool_use in tool_use_blocks:
+                tool_result = await call_tool_function(tool_use.name, tool_use.input)
+                tool_results.append({
+                    "type": "tool_result",
+                    "tool_use_id": tool_use.id,
+                    "content": tool_result
+                })
             
+            messages.append({"role": "assistant", "content": response.content})
             messages.append({"role": "user", "content": tool_results})
             
             response = client.messages.create(
-                model=active_model,
+                model=MODEL_ID,
                 max_tokens=4096,
                 system=SYSTEM_PROMPT,
                 tools=TOOLS,
                 messages=messages
             )
         
-        final_text = ""
+        final_response = ""
         for block in response.content:
-            if block.type == "text":
-                final_text += block.text
+            if hasattr(block, 'text'):
+                final_response += block.text
         
-        messages.append({"role": "assistant", "content": final_text})
+        messages.append({"role": "assistant", "content": final_response})
         
         return ChatResponse(
-            response=final_text,
+            response=final_response,
             conversation_history=messages
         )
-
-    except Exception as e:
-        print(f"Detailed Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
     
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal Agent Loop Error: {str(e)}")
+
 @app.get("/api/health")
 async def health_check():
-    """Health check"""
     return {
-        "status": "healthy (mock data)",
+        "status": "healthy",
         "timestamp": datetime.now().isoformat(),
-        "tools_available": len(TOOLS)
+        "synchronized_records": True,
+        "engine": MODEL_ID
     }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
