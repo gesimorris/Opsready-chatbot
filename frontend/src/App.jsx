@@ -14,7 +14,7 @@ function App() {
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
 
-  const API_BASE_URL = 'http://localhost:8000';
+  const API_BASE_URL = 'opsready-chatbot-d7i9.vercel.app';
 
   const tasks = [
     { title: "Inspect Fire Extinguishers - Building A", assigned: "Sarah Johnson", status: "In Progress", priority: "PRIORITY" },
