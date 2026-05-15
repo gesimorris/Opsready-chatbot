@@ -14,7 +14,7 @@ function App() {
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
 
-  const API_BASE_URL = 'https://opsready-chatbot-d7i9.vercel.app';
+  const API_BASE_URL = 'http://localhost:8000';
 
   const tasks = [
     { title: "Inspect Fire Extinguishers - Building A", assigned: "Sarah Johnson", status: "In Progress", priority: "PRIORITY" },
@@ -163,7 +163,11 @@ function App() {
           </div>
           <div className="messages-area">
             {messages.length === 0 ? (
-              <div className="welcome">How can I help with facility operations today?</div>
+              <div className="welcome">This setup runs as a fully functional MVP/mock demo designed to showcase
+               the core capabilities of the intelligent automation platform I architected for OpsReady, letting 
+               you ask natural language questions about active maintenance schedules, work orders, 
+               and open deficiencies (e.g., "Show me all unassigned emergency tasks"). 
+               </div>
             ) : (
               messages.map((msg, i) => (
                 <div key={i} className={`msg-bubble ${msg.role}`}>{msg.content}</div>

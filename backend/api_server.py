@@ -1,9 +1,8 @@
 """
-OpsReady Chatbot API Server
-Converts MCP tools to REST API endpoints and integrates with Claude API
+OpsReady Chatbot API Server - Mock Demo Mode
+Fully synchronized with frontend data structures and updated for Claude Haiku 4.5.
 """
 import os
-import sys
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from dotenv import load_dotenv
@@ -12,28 +11,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import anthropic
 
-
-sys.path.append(os.path.dirname(__file__))
-
-
-from tools.tool_recent_logins import get_recent_logins
-from tools.tool_get_user_tasks import get_user_tasks
-from tools.tool_debug_tasks_sample import get_task_sample
-from tools.tool_get_all_assigned_users import get_all_assigned_users
-from tools.tool_get_overdue_tasks import get_overdue_tasks
-from tools.tool_get_task_summary_report import get_task_summary_report
-from tools.tool_task_asignee import get_task_assignee
-from tools.tool_activity_feed import get_activity_feed
-from tools.tool_list_forms import get_workspace_forms_tool
-from tools.tool_get_asset_deficiencies import get_asset_deficiencies
-from tools.tool_work_orders import get_work_orders
-from tools.get_deficiency_details import get_deficiency_details
-from tools.tool_get_assets import get_assets
-from tools.tool_teams_tasks import get_team_tasks
-
 load_dotenv()
 
-app = FastAPI(title="OpsReady Chatbot API")
+app = FastAPI(title="OpsReady Chatbot API (Demo)")
 
 app.add_middleware(
     CORSMiddleware,
@@ -49,6 +29,8 @@ app.add_middleware(
 
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
+MODEL_ID = "claude-haiku-4-5-20251001"
+
 class ChatMessage(BaseModel):
     message: str
     conversation_history: Optional[List[Dict[str, Any]]] = []
@@ -57,262 +39,96 @@ class ChatResponse(BaseModel):
     response: str
     conversation_history: List[Dict[str, Any]]
 
-
+# =====================================================================
+#                          MCP TOOL SCHEMAS
+# =====================================================================
 TOOLS = [
     {
-        "name": "get_recent_logins",
-        "description": "Returns users who have logged in since a certain date (YYYY-MM-DD)",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "since_date": {
-                    "type": "string",
-                    "description": "Date in YYYY-MM-DD format"
-                }
-            },
-            "required": ["since_date"]
-        }
-    },
-    {
-        "name": "get_user_tasks",
-        "description": "Get all tasks assigned to a specific user by name, username, or email",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "identifier": {
-                    "type": "string",
-                    "description": "Name, username, or email of the user"
-                }
-            },
-            "required": ["identifier"]
-        }
-    },
-    {
-        "name": "get_task_sample",
-        "description": "Return a small sample of tasks with basic fields for debugging",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "limit": {
-                    "type": "integer",
-                    "description": "How many tasks to show (default 5)",
-                    "default": 5
-                }
-            }
-        }
-    },
-    {
-        "name": "get_all_assigned_users",
-        "description": "List all users who currently have one or more tasks assigned, with task counts",
+        "name": "get_maintenance_schedule",
+        "description": "Returns all active facility maintenance tasks, priorities, statuses, and assignees.",
         "input_schema": {
             "type": "object",
             "properties": {}
         }
     },
     {
-        "name": "get_overdue_tasks",
-        "description": "List all tasks whose due date is before today (UTC)",
+        "name": "get_system_work_orders",
+        "description": "Fetches high-level tracking data for active system work orders.",
         "input_schema": {
             "type": "object",
             "properties": {}
         }
     },
     {
-        "name": "get_task_summary_report",
-        "description": "Generate a summary report of all OpsReady tasks: total, assigned/unassigned, overdue, due soon, and category breakdown",
+        "name": "get_facility_deficiencies",
+        "description": "Lists structural, aesthetic, or immediate physical facility deficiencies.",
         "input_schema": {
             "type": "object",
             "properties": {}
-        }
-    },
-    {
-        "name": "get_task_assignee",
-        "description": "Retrieves task information from a given workspace. If the user asks for unassigned tasks, returns only those with no assignee",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "workspace_name": {
-                    "type": "string",
-                    "description": "The name of the workspace to get tasks from"
-                },
-                "unassigned_only": {
-                    "type": "boolean",
-                    "description": "If true, returns only tasks without an assigned user",
-                    "default": False
-                }
-            },
-            "required": ["workspace_name"]
-        }
-    },
-    {
-        "name": "get_team_tasks",
-        "description": "Get the tasks that are assigned to a team",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "team_name": {
-                    "type": "string",
-                    "description": "The name of the team to get tasks from"
-                }
-            },
-            "required": ["team_name"]
-        }
-    },
-    {
-        "name": "get_activity_feed",
-        "description": "Returns the most active users in a workspace, who has submitted forms, and recent activity",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "workspace_name": {
-                    "type": "string",
-                    "description": "Name of the workspace"
-                }
-            },
-            "required": ["workspace_name"]
-        }
-    },
-    {
-        "name": "get_workspace_forms",
-        "description": "Returns all available forms (and their IDs) for a specific OpsReady workspace",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "workspace_name": {
-                    "type": "string",
-                    "description": "The name of the OpsReady workspace (e.g., 'Summit Base')"
-                }
-            },
-            "required": ["workspace_name"]
-        }
-    },
-    {
-        "name": "get_workspace_deficiencies",
-        "description": "Fetches all deficiencies for a given workspace and lists their status",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "workspace_name": {
-                    "type": "string",
-                    "description": "The name of the workspace to fetch deficiencies for"
-                }
-            },
-            "required": ["workspace_name"]
-        }
-    },
-    {
-        "name": "get_deficiency_details",
-        "description": "Fetches all details about a given deficiency, including task and work order info",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "deficiency_id": {
-                    "type": "string",
-                    "description": "The deficiency ID"
-                }
-            },
-            "required": ["deficiency_id"]
-        }
-    },
-    {
-        "name": "get_work_orders",
-        "description": "Get work orders with optional status filter",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "status": {
-                    "type": "string",
-                    "description": "Status of work orders to filter by (e.g., 'Open', 'Closed')"
-                }
-            }
-        }
-    },
-    {
-        "name": "get_assets",
-        "description": "Fetches all assets from a workspace",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "workspace_name": {
-                    "type": "string",
-                    "description": "The workspace name"
-                }
-            },
-            "required": ["workspace_name"]
         }
     }
 ]
 
-# System prompt for Claude
-SYSTEM_PROMPT = """You are an AI assistant for OpsReady, a workplace operations management platform. You help users query and manage:
+SYSTEM_PROMPT = """You are an AI assistant for OpsReady, a workplace operations management platform. 
+You assist facility operators with tracking maintenance schedules, work orders, and open structural deficiencies.
 
-- Tasks (assignments, due dates, priorities)
-- Work orders (status, details, costs)
-- Deficiencies (asset issues and status)
-- Assets (equipment and inventory)
-- Workspaces (organizational units)
-- Teams (user groups)
-- Activity feeds (recent actions)
-- Forms (data collection tools)
+Your dashboard context contains real-time operational logs. When users ask questions about active operations, use your tools to provide data that matches exactly what they see on screen.
 
-You have access to tools that fetch real-time data from the OpsReady system. When users ask questions, use the appropriate tools to get accurate, current information.
+Be helpful, concise, and professional. 
 
-Be helpful, concise, and professional. Format data clearly using markdown when appropriate."""
+CRITICAL FORMATTING RULE: Whenever you return lists of tasks, work orders, or deficiencies, you MUST format the data as a clean Markdown table with clear column headers (e.g., ID, Asset, Status). If a table cannot be used, format the data using clean, bolded bullet points. Do not wrap data inside dense paragraphs."""
+
+# =====================================================================
+#             SYNCHRONIZED INLINE MOCK OPERATIONAL DATA
+# =====================================================================
 
 async def call_tool_function(tool_name: str, tool_input: Dict[str, Any]) -> str:
-    """Execute the appropriate tool function based on tool name"""
+    """Provides exact mock structural alignment with React state arrays"""
     try:
-        if tool_name == "get_recent_logins":
-            result = await get_recent_logins(tool_input["since_date"])
-        elif tool_name == "get_user_tasks":
-            result = await get_user_tasks(tool_input["identifier"])
-        elif tool_name == "get_task_sample":
-            result = await get_task_sample(tool_input.get("limit", 5))
-        elif tool_name == "get_all_assigned_users":
-            result = await get_all_assigned_users()
-        elif tool_name == "get_overdue_tasks":
-            result = await get_overdue_tasks()
-        elif tool_name == "get_task_summary_report":
-            result = await get_task_summary_report()
-        elif tool_name == "get_task_assignee":
-            result = await get_task_assignee(
-                tool_input["workspace_name"],
-                tool_input.get("unassigned_only", False)
+        if tool_name == "get_maintenance_schedule":
+            return (
+                "Active Maintenance Tasks:\n"
+                "- **Inspect Fire Extinguishers - Building A** | Assigned to: Sarah Johnson | Status: In Progress | Priority: PRIORITY\n"
+                "- **Replace HVAC Filters - Floor 3** | Assigned to: Mike Chen | Status: Open | Priority: ROUTINE\n"
+                "- **Emergency Exit Sign Repair** | Assigned to: Unassigned | Status: Open | Priority: EMERGENCY\n"
+                "- **Monthly Safety Inspection** | Assigned to: David Martinez | Status: Complete | Priority: ROUTINE\n"
+                "- **Boiler Maintenance Check** | Assigned to: Sarah Johnson | Status: Open | Priority: PRIORITY"
             )
-        elif tool_name == "get_team_tasks":
-            result = await get_team_tasks(tool_input["team_name"])
-        elif tool_name == "get_activity_feed":
-            result = await get_activity_feed(tool_input["workspace_name"])
-        elif tool_name == "get_workspace_forms":
-            result = await get_workspace_forms_tool(tool_input["workspace_name"])
-        elif tool_name == "get_workspace_deficiencies":
-            result = await get_asset_deficiencies(tool_input["workspace_name"])
-        elif tool_name == "get_deficiency_details":
-            result = await get_deficiency_details(tool_input["deficiency_id"])
-        elif tool_name == "get_work_orders":
-            result = await get_work_orders(status=tool_input.get("status"))
-        elif tool_name == "get_assets":
-            result = await get_assets(tool_input["workspace_name"])
+            
+        elif tool_name == "get_system_work_orders":
+            return (
+                "System Work Orders:\n"
+                "- **WO-2024-001**: Plumbing System - Leaking pipe in basement | Status: Open\n"
+                "- **WO-2024-002**: Elevator - Main - Maintenance completed | Status: Closed"
+            )
+            
+        elif tool_name == "get_facility_deficiencies":
+            return (
+                "Unresolved Facility Deficiencies:\n"
+                "- **DEF-001**: Cracked window in lobby | Status: Unresolved\n"
+                "- **DEF-002**: Broken door handle - Room 205 | Status: Unresolved"
+            )
+            
         else:
-            return f"Unknown tool: {tool_name}"
-        
-        if isinstance(result, list):
-            return "\n".join([item.text for item in result if hasattr(item, 'text')])
-        return str(result)
-    
+            return f"Unknown core service: {tool_name}"
+            
     except Exception as e:
-        return f"Error executing {tool_name}: {str(e)}"
+        return f"Error executing data pipe mock: {str(e)}"
+
+# =====================================================================
+#                        CHAT ROUTING PIPELINE
+# =====================================================================
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatMessage):
-    """Main chat endpoint - processes user message with Claude and tool execution"""
+    """Processes chat cycles using updated model configurations and inline data tools"""
     try:
         messages = request.conversation_history + [
             {"role": "user", "content": request.message}
         ]
         
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=MODEL_ID,
             max_tokens=4096,
             system=SYSTEM_PROMPT,
             tools=TOOLS,
@@ -335,7 +151,7 @@ async def chat(request: ChatMessage):
             messages.append({"role": "user", "content": tool_results})
             
             response = client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model=MODEL_ID,
                 max_tokens=4096,
                 system=SYSTEM_PROMPT,
                 tools=TOOLS,
@@ -355,15 +171,15 @@ async def chat(request: ChatMessage):
         )
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal Agent Loop Error: {str(e)}")
 
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint"""
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
-        "tools_available": len(TOOLS)
+        "synchronized_records": True,
+        "engine": MODEL_ID
     }
 
 if __name__ == "__main__":
